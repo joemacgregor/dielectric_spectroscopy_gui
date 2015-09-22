@@ -7,11 +7,13 @@ function inv_cole_gui
 % 
 % INV_COLE_GUI requires a license for the Optimization Toolbox.
 % 
+% See dielectric_spectroscopy_gui_man.pdf for operation.
+% 
 % David Stillman (SwRI-Boulder), Joe MacGregor (UTIG)
-% Last updated: 09/15/15
+% Last updated: 09/22/15
 
 if ~license('test', 'optimization_toolbox')
-    warning('inv_cole_gui:optimtoolbox', 'Optimization Toolbox must be licensed to invert dielectric spectra (uses LSQNONLIN).')
+    error('inv_cole_gui:optimtoolbox', 'Optimization Toolbox must be licensed to invert dielectric spectra (uses LSQNONLIN).')
 end
 
 % adjust directory to search for reference arrhenius profiles
@@ -47,33 +49,33 @@ relax_guess                 = [30                   5e2                 0.01;
                                1                    0.01                0.2];
 
 % min/max values for sliders
-permitt_hf_min              = 1;        % dimensionless
+permitt_hf_min              = 1; % dimensionless
 permitt_hf_max              = 20;
-conduct_dc_min              = 1e-12;    % S/m
+conduct_dc_min              = 1e-12; % S/m
 conduct_dc_max              = 1e-2;
 permitt_diff_min            = 0; %#ok<*NASGU>
-permitt_diff_max            = 500;      % dimensionless
-freq_relax_min              = 1e-3;     % Hz
+permitt_diff_max            = 500; % dimensionless
+freq_relax_min              = 1e-3; % Hz
 freq_relax_max              = 1e5;
-alpha_cole_min              = 0;        % dimensionless
+alpha_cole_min              = 0; % dimensionless
 alpha_cole_max              = 1;
-tol                         = 0.95;     % confidence interval tolerance for uncertainty calculations, e.g., 0.95 is 95%
+tol                         = 0.95; % confidence interval tolerance for uncertainty calculations, e.g., 0.95 is 95%
 frac_test                   = [0.25 0.75 2 5 10]; % range around model_final value about which to test (fraction of model_final value)
 err_rel                     = [0.05 0.1]; % relative error of data [real imag]
 
 % repeat mins/maxes for each parameter
 [permitt_diff_min_1, permitt_diff_min_2, permitt_diff_min_3, permitt_diff_min_4] ...
-                            = deal(permitt_diff_min);
+                            = deal(permitt_diff_min); %#ok<ASGLU>
 [permitt_diff_max_1, permitt_diff_max_2, permitt_diff_max_3, permitt_diff_max_4] ...
-                            = deal(permitt_diff_max);
+                            = deal(permitt_diff_max); %#ok<ASGLU>
 [freq_relax_min_1, freq_relax_min_2, freq_relax_min_3, freq_relax_min_4] ...
-                            = deal(freq_relax_min);
+                            = deal(freq_relax_min); %#ok<ASGLU>
 [freq_relax_max_1, freq_relax_max_2, freq_relax_max_3, freq_relax_max_4] ...
-                            = deal(freq_relax_max);
+                            = deal(freq_relax_max); %#ok<ASGLU>
 [alpha_cole_min_1, alpha_cole_min_2, alpha_cole_min_3, alpha_cole_min_4] ...
-                            = deal(alpha_cole_min);
+                            = deal(alpha_cole_min); %#ok<ASGLU>
 [alpha_cole_max_1, alpha_cole_max_2, alpha_cole_max_3, alpha_cole_max_4] ...
-                            = deal(alpha_cole_max);
+                            = deal(alpha_cole_max); %#ok<ASGLU>
 
 % min/max values for model that bound the inversion
 model_min_abs               = [permitt_hf_min; repmat([permitt_diff_min; freq_relax_min; alpha_cole_min], 4, 1)];
@@ -94,8 +96,8 @@ load_all                    = struct;
 [ax, relax_check, period_relax_edit, permitt_diff_edit, freq_relax_edit, alpha_cole_edit, permitt_diff_box, freq_relax_box, alpha_cole_box, permitt_diff_slide, freq_relax_slide, alpha_cole_slide, p_model, p_freq_min, p_freq_max, activ_relax] ...
                             = deal(NaN(1, 4));
 p_data                      = NaN(4, 2);
-[curr_temp, freq, num_temp, permitt_real, permitt_imag, conduct, resist_phase, temp_mean, temp_std, temp_mean_alt, permitt_comp_model, permitt_hf, conduct_hf, conduct_dc, conduct_dc_std, freq_trim, permitt_real_trim, permitt_imag_trim, conduct_trim, weight_freq, model_guess, model_final, ...
- res_model, permitt_diff, freq_relax, alpha_cole, permitt_diff_std, freq_relax_std, alpha_cole_std, permitt_real_model, permitt_imag_model, conduct_model, phase_model, temp_min, temp_max, temp_vec, temp_inv_vec, temp_mean_inv, permitt_diff_cat, freq_relax_cat, alpha_cole_cat, ...
+[curr_temp, curr_relax_var, freq, num_temp, permitt_real, permitt_imag, conduct, resist_phase, temp_mean, temp_std, temp_mean_alt, permitt_comp_model, permitt_hf, conduct_hf, conduct_dc, conduct_dc_std, freq_trim, permitt_real_trim, permitt_imag_trim, conduct_trim, weight_freq, model_guess, ...
+ model_final, res_model, permitt_diff, freq_relax, alpha_cole, permitt_diff_std, freq_relax_std, alpha_cole_std, permitt_real_model, permitt_imag_model, conduct_model, phase_model, temp_min, temp_max, temp_vec, temp_inv_vec, temp_mean_inv, permitt_diff_cat, freq_relax_cat, alpha_cole_cat, ...
  conduct_hf_model, load_all, model_std, inv_done, permitt_hf_model, permitt_hf_model_std, model_min, model_max, relax_ord, model_final_old, num_inv, permitt_comp_model_full, permitt_real_model_full, conduct_model_full, permitt_imag_model_full, phase_model_full, curr_param, ...
  curr_range, param_tmp, model_tmp, res, res_def, chisq_diff, num_param, err, activ_dc, activ_dc_poly, curr_ind, ind_trim, permitt_comp_model_sep, permitt_real_model_sep, permitt_imag_model_sep, conduct_model_sep, length_freq, dia, curr_slide, tmp1, tmp2, period_relax, period_relax_std, ...
  period_relax_cat, period_relax_std_cat] ...
@@ -116,7 +118,7 @@ ylim_def                    = [1 1e2; 1e-12 1e-2; 1e-3 1e3]; % ylims for each su
 plots1                      = {'permitt_real{curr_temp}' 'conduct{curr_temp}' 'permitt_imag{curr_temp}' '(resist_phase{curr_temp} .* (180 / pi))'}; % data plot strings
 plots2                      = {'permitt_real_model_full{curr_temp}' 'conduct_model_full{curr_temp}' 'permitt_imag_model_full{curr_temp}' '(phase_model_full{curr_temp} .* (180 / pi))'}; % model plot strings
 plots3                      = {'permitt_real_model_sep{curr_temp}{jj}' 'conduct_model_sep{curr_temp}{jj}' 'permitt_imag_model_sep{curr_temp}{jj}'}; % model plot strings
-ylabels                     = {'\epsilon''' '\sigma (S/m)' '\epsilon''''' '\theta (\circ)'}; % ylabels for each supblot
+ylabels                     = {'\epsilon''' '\sigma (S m^{-1})' '\epsilon''''' '\theta (\circ)'}; % ylabels for each supblot
 relax_labels                = {'\Delta \epsilon' 'f_r' '\alpha'}; % labels for each slider
 relax_labels_alt            = {'D-e-r' 'f-r' 'alpha'}; % labels for each slider
 relax_simple                = {'permitt_diff' 'freq_relax' 'alpha_cole'}; % parameters within each relaxation
@@ -126,7 +128,7 @@ subplot_start               = [0.05 0.47 0.35 0.35]; % start position of 1st sub
 % initialize odds and ends for the results plot
 axf                         = NaN(1, 6); % axis handles
 colors_fit                  = {'k' 'r' 'b' 'm'}; % easy colors for up to 4 different relaxations
-ylabels_fit                 = {'{\Delta}{\epsilon}''' 'f_r (Hz)' '\alpha' '\epsilon''_{HF}' '\sigma_{DC}, \sigma_{HF} (S/m)' 'Residual'}; % ylabels on fit plot
+ylabels_fit                 = {'{\Delta}{\epsilon}''' 'f_r (Hz)' '\alpha' '\epsilon''_{HF}' '\sigma_{DC}, \sigma_{HF} (S m^{-1})' 'Residual'}; % ylabels on fit plot
 colors_sep                  = ['g' colors_fit 'c'];
 
 % load existing relaxation frequency background data
@@ -180,38 +182,38 @@ for ii = 1:4
     box on
 end
 linkaxes(ax, 'x')
-annotation('textbox', [0.01 0.95 0.03 0.04], 'string', 'Load', 'fontsize', 16, 'color', 'b', 'edgecolor', 'none')
-uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'data', 'units', 'normalized', 'position', [0.06 0.95 0.055 0.04], 'callback', @load_merge, 'fontsize', 16, 'foregroundcolor', 'b')
-uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'config.', 'units', 'normalized', 'position', [0.13 0.95 0.06 0.04], 'callback', @load_cfg, 'fontsize', 16, 'foregroundcolor', 'b')
+annotation('textbox', [0.01 0.95 0.03 0.04], 'string', 'Load', 'fontsize', 16, 'color', 'k', 'edgecolor', 'none')
+uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'data', 'units', 'normalized', 'position', [0.06 0.95 0.055 0.04], 'callback', @load_merge, 'fontsize', 16, 'foregroundcolor', 'k')
+uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'config.', 'units', 'normalized', 'position', [0.13 0.95 0.06 0.04], 'callback', @load_cfg, 'fontsize', 16, 'foregroundcolor', 'k')
 uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'Clear plot', 'units', 'normalized', 'position', [0.01 0.84 0.08 0.04], 'callback', @nuke_plot, 'fontsize', 16, 'foregroundcolor', 'r')
 uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'Erase', 'units', 'normalized', 'position', [0.74 0.83 0.07 0.04], 'callback', @nuke_inv, 'fontsize', 16, 'foregroundcolor', 'r')
-uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'Invert', 'units', 'normalized', 'position', [0.74 0.89 0.07 0.04], 'callback', @do_inv, 'fontsize', 16, 'foregroundcolor', 'r')
-uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'Next', 'units', 'normalized', 'position', [0.59 0.95 0.07 0.04], 'callback', @do_next, 'fontsize', 16, 'foregroundcolor', 'r')
+uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'Invert', 'units', 'normalized', 'position', [0.74 0.89 0.07 0.04], 'callback', @do_inv, 'fontsize', 16, 'foregroundcolor', 'b')
+uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'Next', 'units', 'normalized', 'position', [0.59 0.95 0.07 0.04], 'callback', @do_next, 'fontsize', 16, 'foregroundcolor', 'b')
 uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'Save data', 'units', 'normalized', 'position', [0.67 0.95 0.07 0.04], 'callback', @save_inv, 'fontsize', 16, 'foregroundcolor', 'g')
 uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'config.', 'units', 'normalized', 'position', [0.74 0.95 0.07 0.04], 'callback', @save_cfg, 'fontsize', 16, 'foregroundcolor', 'g')
 weight_check                = uicontrol(inv_gui, 'style', 'checkbox', 'units', 'normalized', 'position', [0.10 0.84 0.08 0.04], 'string', 'weight', 'callback', @check_weight, 'fontsize', 16, 'value', double(do_weight));
 sep_check                   = uicontrol(inv_gui, 'style', 'checkbox', 'units', 'normalized', 'position', [0.15 0.84 0.08 0.04], 'string', 'disp. sep.', 'callback', @check_sep, 'fontsize', 16, 'value', double(do_sep));
-file_box                    = annotation('textbox', [0.01 0.89 0.20 0.04], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none');
-annotation('textbox', [0.22 0.94 0.05 0.05], 'string', 'f_{min}', 'fontsize', 16, 'edgecolor', 'none')
-freq_min_edit               = annotation('textbox', [0.26 0.95 0.05 0.03], 'string', sprintf(relax_str{2}, freq_min), 'fontsize', 16, 'color', 'b', 'edgecolor', 'none');
+file_box                    = annotation('textbox', [0.01 0.89 0.20 0.04], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none', 'linewidth', 1);
+annotation('textbox', [0.22 0.94 0.05 0.05], 'string', 'f_{min}', 'fontsize', 16, 'edgecolor', 'none', 'color', 'b')
+freq_min_edit               = annotation('textbox', [0.26 0.95 0.05 0.03], 'string', sprintf(relax_str{2}, freq_min), 'fontsize', 16, 'color', 'b', 'edgecolor', 'none', 'linewidth', 1);
 freq_min_slide              = uicontrol(inv_gui, 'style', 'slider', 'units', 'normalized', 'position', [0.22 0.91 0.17 0.02], 'callback', @slide_freq_min, 'min', -3, 'max', 4, 'value', log10(freq_min), 'sliderstep', [0.01 0.1]);
-annotation('textbox', [0.22 0.85 0.05 0.05], 'string', 'f_{max}', 'fontsize', 16, 'edgecolor', 'none')
-freq_max_edit               = annotation('textbox', [0.26 0.87 0.05 0.03], 'string', sprintf(relax_str{2}, freq_max), 'fontsize', 16, 'color', 'b', 'edgecolor', 'none');
+annotation('textbox', [0.22 0.85 0.05 0.05], 'string', 'f_{max}', 'fontsize', 16, 'edgecolor', 'none', 'color', 'b')
+freq_max_edit               = annotation('textbox', [0.26 0.87 0.05 0.03], 'string', sprintf(relax_str{2}, freq_max), 'fontsize', 16, 'color', 'b', 'edgecolor', 'none', 'linewidth', 1);
 freq_max_slide              = uicontrol(inv_gui, 'style', 'slider', 'units', 'normalized', 'position', [0.22 0.83 0.17 0.02], 'callback', @slide_freq_max, 'min', 3, 'max', 6, 'value', log10(freq_max), 'sliderstep', [0.01 0.1]);
-uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'eHF', 'units', 'normalized', 'position', [0.40 0.94 0.04 0.04], 'callback', @lim_permitt_hf, 'fontsize', 16, 'foregroundcolor', 'k')
-permitt_hf_edit             = annotation('textbox', [0.445 0.95 0.05 0.03], 'string', sprintf(relax_str{1}, permitt_hf_guess), 'fontsize', 16, 'color', 'b', 'edgecolor', 'none');
-permitt_hf_box              = annotation('textbox', [0.50 0.95 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'color', 'r');
+uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'eHF', 'units', 'normalized', 'position', [0.40 0.94 0.04 0.04], 'callback', @lim_permitt_hf, 'fontsize', 16, 'foregroundcolor', 'b')
+permitt_hf_edit             = annotation('textbox', [0.445 0.95 0.05 0.03], 'string', sprintf(relax_str{1}, permitt_hf_guess), 'fontsize', 16, 'color', 'b', 'edgecolor', 'none', 'linewidth', 1);
+permitt_hf_box              = annotation('textbox', [0.50 0.95 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'color', 'r', 'linewidth', 1);
 permitt_hf_slide            = uicontrol(inv_gui, 'style', 'slider', 'units', 'normalized', 'position', [0.40 0.91 0.17 0.02], 'callback', @slide_permitt_hf, 'min', permitt_hf_min, 'max', permitt_hf_max, 'value', permitt_hf_guess);
-uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'DC', 'units', 'normalized', 'position', [0.40 0.85 0.04 0.04], 'callback', @lim_conduct_dc, 'fontsize', 16, 'foregroundcolor', 'k')
-conduct_dc_edit             = annotation('textbox', [0.445 0.87 0.05 0.03], 'string', sprintf(relax_str{2}, conduct_dc_guess), 'fontsize', 16, 'color', 'b', 'edgecolor', 'none');
-conduct_dc_box              = annotation('textbox', [0.50 0.87 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'color', 'r');
+uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'DC', 'units', 'normalized', 'position', [0.40 0.85 0.04 0.04], 'callback', @lim_conduct_dc, 'fontsize', 16, 'foregroundcolor', 'b')
+conduct_dc_edit             = annotation('textbox', [0.445 0.87 0.05 0.03], 'string', sprintf(relax_str{2}, conduct_dc_guess), 'fontsize', 16, 'color', 'b', 'edgecolor', 'none', 'linewidth', 1);
+conduct_dc_box              = annotation('textbox', [0.50 0.87 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'color', 'r', 'linewidth', 1);
 conduct_dc_check            = uicontrol(inv_gui, 'style', 'checkbox', 'units', 'normalized', 'position', [0.56 0.86 0.02 0.03], 'callback', @check_dc, 'fontsize', 16, 'value', double(do_dc));
 conduct_dc_slide            = uicontrol(inv_gui, 'style', 'slider', 'units', 'normalized', 'position', [0.40 0.83 0.17 0.02], 'callback', @slide_conduct_dc, 'min', log10(conduct_dc_min), 'max', log10(conduct_dc_max), 'value', log10(conduct_dc_guess));
 temp_box                    = uicontrol(inv_gui, 'style', 'popupmenu', 'string', 'N/A', 'units', 'normalized', 'position', [0.59 0.89 0.07 0.05], 'callback', @plot_data, 'fontsize', 16);
-fm_edit                     = annotation('textbox', [0.59 0.83 0.06 0.04], 'string', '', 'color', 'b', 'backgroundcolor', 'w', 'edgecolor', 'k', 'fontsize', 16);
-inv_edit                    = annotation('textbox', [0.66 0.83 0.06 0.04], 'string', '', 'color', 'r', 'backgroundcolor', 'w', 'edgecolor', 'k', 'fontsize', 16);
-inv_done_edit               = annotation('textbox', [0.67 0.89 0.04 0.04], 'string', '0 /', 'color', 'r', 'fontsize', 16, 'edgecolor', 'none');
-inv_tot                     = annotation('textbox', [0.70 0.89 0.03 0.04], 'string', '', 'color', 'r', 'fontsize', 16, 'edgecolor', 'none');
+fm_edit                     = annotation('textbox', [0.59 0.83 0.06 0.04], 'string', '', 'color', 'b', 'backgroundcolor', 'w', 'edgecolor', 'k', 'fontsize', 16, 'linewidth', 1);
+inv_edit                    = annotation('textbox', [0.66 0.83 0.06 0.04], 'string', '', 'color', 'r', 'backgroundcolor', 'w', 'edgecolor', 'k', 'fontsize', 16, 'linewidth', 1);
+inv_done_edit               = annotation('textbox', [0.67 0.89 0.04 0.04], 'string', '0 /', 'color', 'r', 'fontsize', 16, 'edgecolor', 'none', 'linewidth', 1);
+inv_tot                     = annotation('textbox', [0.70 0.89 0.03 0.04], 'string', '', 'color', 'r', 'fontsize', 16, 'edgecolor', 'none', 'linewidth', 1);
 relax_group                 = uibuttongroup('position', [0.82 0.91 0.17 0.08], 'selectionchangefcn', @relax_radio);
 uicontrol(inv_gui, 'style', 'text', 'parent', relax_group, 'units', 'normalized', 'position', [0 0.6 0.9 0.3], 'string', '# relaxations', 'fontsize', 16)
 for ii = 1:4
@@ -223,20 +225,22 @@ for ii = 1:4 % set up sliders
         eval(['uicontrol(inv_gui, ''style'', ''pushbutton'', ''units'', ''normalized'', ''position'', [0.82 ' num2str(0.84 - ((ii - 1) * 0.22) - ((jj - 1) * 0.06)) ' 0.05 0.04], ''callback'', @lim_' relax_simple{jj} '_' num2str(ii) ', ''fontsize'', 16, ''string'', [''' ...
               relax_labels_alt{jj} ''' ''(' num2str(ii) ')''], ''foregroundcolor'', ''' colors_fit{ii} ''')'])
         eval([relax_simple{jj} '_edit(' num2str(ii) ') = annotation(''textbox'', [0.88 ' num2str(0.84 - ((ii - 1) * 0.22) - ((jj - 1) * 0.06)) ' 0.05 0.04], ''string'', sprintf(''' relax_str{jj} ''', relax_guess(' num2str(ii) ',' num2str(jj) ...
-              ')), ''fontsize'', 16, ''color'', ''b'', ''edgecolor'', ''none'');'])
-        eval([relax_simple{jj} '_box(' num2str(ii) ') = annotation(''textbox'', [0.93 ' num2str(0.85 - ((ii - 1) * 0.22) - ((jj - 1) * 0.06)) ' 0.06 0.03], ''string'', '''', ''fontsize'', 16, ''backgroundcolor'', ''w'', ''edgecolor'', ''k'', ''color'', ''r'');'])
+              ')), ''fontsize'', 16, ''color'', ''b'', ''edgecolor'', ''none'', ''linewidth'', 1);'])
+        eval([relax_simple{jj} '_box(' num2str(ii) ') = annotation(''textbox'', [0.93 ' num2str(0.85 - ((ii - 1) * 0.22) - ((jj - 1) * 0.06)) ' 0.06 0.03], ''string'', '''', ''fontsize'', 16, ''backgroundcolor'', ''w'', ''edgecolor'', ''k'', ''color'', ''r'', ''linewidth'', 1);'])
         eval([relax_simple{jj} '_slide(' num2str(ii) ') = uicontrol(inv_gui, ''style'', ''slider'', ''units'', ''normalized'', ''position'', [0.82 ' ...
             num2str(0.82 - ((ii - 1) * 0.22) - ((jj - 1) * 0.06)) ' 0.17 0.02], ''callback'', @slide_' relax_simple{jj} '_' num2str(ii) ', ''fontsize'', 16, ''min'', ' relax_simple{jj} '_min, ''max'', ' relax_simple{jj} '_max, ''value'', ' num2str(relax_guess(ii, jj)) ');'])
         if (jj == 2)
             set(eval(['' relax_simple{jj} '_edit(' num2str(ii) ')' '']), 'position', (eval(['' 'get(' relax_simple{jj} '_edit(' num2str(ii) '), ''position'')' '']) + [-0.01 0 0 0]))
             set(eval(['' relax_simple{jj} '_slide(' num2str(ii) ')' '']), 'min', log10(eval(['' relax_simple{jj} '_min' ''])), 'max', log10(eval(['' relax_simple{jj} '_max' ''])), 'value', log10(relax_guess(ii, jj)))
             period_relax_edit(ii) ...
-                            = annotation('textbox', [0.88 (0.82 - ((ii - 1) * 0.22) - ((jj - 1) * 0.06)) 0.05 0.04], 'string', sprintf(relax_str{jj}, (1 / (2 * pi * relax_guess(ii, jj)))), 'fontsize', 14, 'color', 'b', 'edgecolor', 'none');
+                            = annotation('textbox', [0.88 (0.82 - ((ii - 1) * 0.22) - ((jj - 1) * 0.06)) 0.05 0.04], 'string', sprintf(relax_str{jj}, (1 / (2 * pi * relax_guess(ii, jj)))), 'fontsize', 14, 'color', 'b', 'edgecolor', 'none', 'linewidth', 1);
         end
         set(eval([relax_simple{jj} '_slide(' num2str(ii) ')']), 'sliderstep', ([0.1 0.1] .* get(eval([relax_simple{jj} '_slide(' num2str(ii) ')']), 'sliderstep')))
     end
 end
-uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'test', 'units', 'normalized', 'position', [0.945 0.95 0.04 0.04], 'callback', @misctest, 'fontsize', 16, 'foregroundcolor', 'r')
+uicontrol(inv_gui, 'style', 'pushbutton', 'string', 'test', 'units', 'normalized', 'position', [0.945 0.95 0.04 0.04], 'callback', @misctest, 'fontsize', 16, 'foregroundcolor', 'b')
+
+pause(1)
 
 %% arrhenius inversion results plot
 arr_fig                     = figure('toolbar', 'figure', 'name', 'INV_RESULTS', 'position', [1 1 1600 1200], 'keypressfcn', @keypress2);
@@ -255,6 +259,7 @@ for ii = 1:6
     ylabel(ylabels_fit{ii})
     grid on
     box on
+    xlim([min([temp_inv_AC(:); temp_inv_K(:); temp_inv_sat(:)]) max([temp_inv_AC(:); temp_inv_K(:); temp_inv_sat(:)])])
 end
 linkaxes(axf, 'x')
 
@@ -277,16 +282,10 @@ figure(inv_gui)
         nuke_inv
         
         % remove previously loaded data and forward model
-        if any(ishandle(p_data(:)))
-            delete(p_data(ishandle(p_data(:))))
-            set(file_box, 'string', '')
-        end
-        if any(ishandle(p_model(:)))
-            delete(p_model(ishandle(p_model(:))))
-        end
-        if any(ishandle(p_model_sep(:)))
-            delete(p_model_sep(ishandle(p_model_sep(:))))
-        end
+        set(file_box, 'string', '')
+        delete(p_data(ishandle(p_data(:))))
+        delete(p_model(ishandle(p_model(:))))
+        delete(p_model_sep(ishandle(p_model_sep(:))))
         
         % dialog box to get merged data file to load
         if ~isempty(path_curr)
@@ -301,64 +300,168 @@ figure(inv_gui)
                             = deal('');
         end
         
-        if ~isempty(file_merge)
-            
-            data_loaded     = true;
-            
-            % load file and display in filename box
-            load_all        = load([path_curr file_merge]);
-            set(file_box, 'string', file_merge(1:(end - 4)))
-            
-            % distribute loaded data to better variable names
-            [freq, permitt_real, permitt_imag, conduct, resist_phase, temp_mean, temp_std] ...
+        if isempty(file_merge)
+            return
+        end
+        
+        % load file and display in filename box
+        load_all            = load([path_curr file_merge]);
+        set(file_box, 'string', file_merge(1:(end - 4)))
+        
+        % distribute loaded data to better variable names
+        [freq, permitt_real, permitt_imag, conduct, resist_phase, temp_mean, temp_std] ...
                             = deal(load_all.freq, load_all.permitt_real, load_all.permitt_imag, load_all.conduct, load_all.resist_phase, load_all.temp_mean, load_all.temp_std); %#ok<*SETNU>
+        
+        num_temp            = length(temp_mean); % number of temperatures is determined from temp_mean
+        
+        temp_str            = cell(num_temp, 1);
+        % put all temperatures in the pull-down menu
+        for ii = 1:num_temp
+            temp_str{ii}    = num2str(round(temp_mean(ii)));
+        end
+        set(temp_box, 'string', temp_str)
+        
+        % initialize a whole bunch of variables now that we have num_temp (note they start life as NaNs not zeros)
+        [permitt_hf, conduct_hf, conduct_dc, conduct_hf_model, permitt_hf_model, res_def, chisq_diff, num_param, res_model, length_freq] ...
+                            = deal(NaN(num_temp, 1));
+        for ii = 1:num_temp
+            length_freq(ii) = length(freq{ii});
+        end
+        [permitt_hf_model_std, conduct_dc_std] ...
+                            = deal(NaN(num_temp, 2));
+        [freq_trim, permitt_real_trim, permitt_imag_trim, conduct_trim, weight_freq, model_guess, permitt_real_model, permitt_imag_model, conduct_model, phase_model, model_final, permitt_diff, freq_relax, alpha_cole, permitt_real_model_full, permitt_imag_model_full, conduct_model_full, ...
+         phase_model_full, model_std, permitt_diff_std, freq_relax_std, alpha_cole_std, model_min, model_max, permitt_real_model_sep, permitt_imag_model_sep, conduct_model_sep, period_relax, period_relax_std] ...
+                            = deal(cell(num_temp, 1));
+        [permitt_diff_cat, freq_relax_cat, alpha_cole_cat, period_relax_cat] ...
+                            = deal(NaN(4, num_temp));
+        
+        for ii = 1:4
+            [permitt_diff_std_cat{ii}, freq_relax_std_cat{ii}, alpha_cole_std_cat{ii}, period_relax_std_cat{ii}] ...
+                            = deal(NaN(num_temp, 2));
+        end
+        num_relax           = 2 .* ones(1, num_temp); % default to two relaxations
+        [do_dc, inv_done]   = deal(false(1, num_temp)); % default no DC conductivity
+        
+        temp_mean_alt       = (1 / (temp_mean(1) + 273.15)) - (1 ./ (temp_mean + 273.15)); % Arrhenius inverse temperature of temp_mean
+        
+        % odds and ends for fit plot
+        temp_min            = min(temp_mean) - mod(min(temp_mean), 10) - 10;
+        temp_max            = max(temp_mean) - mod(max(temp_mean), 10) + 10;
+        temp_vec            = temp_min:10:temp_max;
+        temp_inv_vec        = 1e3 ./ (temp_vec + 273.15);
+        temp_mean_inv       = 1e3 ./ (temp_mean + 273.15);
+        
+        set(temp_box, 'value', 1)
+        set(inv_tot, 'string', num2str(num_temp))
+        
+        data_loaded         = true;        
+        plot_data % plot the first (should be lowest) temperature 
+    end
 
-            num_temp        = length(temp_mean); % number of temperatures is determined from temp_mean
-            
+%% load configuration file
+
+    function load_cfg(source, eventdata)
+        if ~focus_check
+            focus_check     = true;
+        end
+        if ~isempty(path_curr)
+            [file_merge, path_curr] ...
+                            = uigetfile('*.mat', 'Load configuration:', path_curr);
+        else
+            [file_merge, path_curr] ...
+                            = uigetfile('*.mat', 'Load configuration:');
+        end
+        if ~file_merge
+            [file_merge, path_curr] ...
+                            = deal('');
+        end
+        if ~isempty(file_merge)
+            load_all        = load([path_curr file_merge]);
+            try
+                [freq_min, freq_max, freq_trim, do_weight, weight_freq, num_relax, do_dc, relax_guess, model_guess, permitt_hf_guess, conduct_dc_guess, model_final, permitt_hf, permitt_hf_model, permitt_hf_model_std, conduct_hf, conduct_hf_model, conduct_dc, conduct_dc_std, ...
+                 permitt_real_model, permitt_imag_model, conduct_model, phase_model, res_model, freq_relax, freq_relax_cat, freq_relax_std, freq_relax_std_cat, alpha_cole, alpha_cole_cat, alpha_cole_std, alpha_cole_std_cat, permitt_diff, permitt_diff_cat, permitt_diff_std, ...
+                 permitt_diff_std_cat, permitt_real_trim, permitt_imag_trim, activ_relax, activ_relax_poly, activ_dc, activ_dc_poly, period_relax, period_relax_std, period_relax_cat, period_relax_std_cat] ...
+                            = deal(load_all.freq_min, load_all.freq_max, load_all.freq_trim, load_all.do_weight, load_all.weight_freq, load_all.num_relax, load_all.do_dc, load_all.relax_guess, load_all.model_guess, load_all.permitt_hf_guess, load_all.conduct_dc_guess, load_all.model_final, ...
+                                   load_all.permitt_hf, load_all.permitt_hf_model, load_all.permitt_hf_model_std, load_all.conduct_hf, load_all.conduct_hf_model, load_all.conduct_dc, load_all.conduct_dc_std, load_all.permitt_real_model, load_all.permitt_imag_model, load_all.conduct_model, ...
+                                   load_all.phase_model, load_all.res_model, load_all.freq_relax, load_all.freq_relax_cat, load_all.freq_relax_std, load_all.freq_relax_std_cat, load_all.alpha_cole, load_all.alpha_cole_cat, load_all.alpha_cole_std, load_all.alpha_cole_std_cat, ...
+                                   load_all.permitt_diff, load_all.permitt_diff_cat, load_all.permitt_diff_std, load_all.permitt_diff_std_cat, load_all.permitt_real_trim, load_all.permitt_imag_trim, load_all.activ_relax, load_all.activ_relax_poly, load_all.activ_dc, load_all.activ_dc_poly, ...
+                                   load_all.period_relax, load_all.period_relax_std, load_all.period_relax_cat, load_all.period_relax_std_cat);
+            catch %#ok<CTCH>
+                [freq_min, freq_max, freq_trim, do_weight, weight_freq, num_relax, do_dc, relax_guess, model_guess, permitt_hf_guess, conduct_dc_guess, model_final, permitt_hf, permitt_hf_model, permitt_hf_model_std, conduct_hf, conduct_hf_model, conduct_dc, conduct_dc_std, ...
+                 permitt_real_model, permitt_imag_model, conduct_model, phase_model, res_model, freq_relax, freq_relax_cat, freq_relax_std, freq_relax_std_cat, alpha_cole, alpha_cole_cat, alpha_cole_std, alpha_cole_std_cat, permitt_diff, permitt_diff_cat, permitt_diff_std, ...
+                 permitt_diff_std_cat, permitt_real_trim, permitt_imag_trim, activ_relax, activ_relax_poly, activ_dc, activ_dc_poly] ...
+                            = deal(load_all.freq_min, load_all.freq_max, load_all.freq_trim, load_all.do_weight, load_all.weight_freq, load_all.num_relax, load_all.do_dc, load_all.relax_guess, load_all.model_guess, load_all.permitt_hf_guess, load_all.conduct_dc_guess, load_all.model_final, ...
+                                   load_all.permitt_hf, load_all.permitt_hf_model, load_all.permitt_hf_model_std, load_all.conduct_hf, load_all.conduct_hf_model, load_all.conduct_dc, load_all.conduct_dc_std, load_all.permitt_real_model, load_all.permitt_imag_model, load_all.conduct_model, ...
+                                   load_all.phase_model, load_all.res_model, load_all.freq_relax, load_all.freq_relax_cat, load_all.freq_relax_std, load_all.freq_relax_std_cat, load_all.alpha_cole, load_all.alpha_cole_cat, load_all.alpha_cole_std, load_all.alpha_cole_std_cat, ...
+                                   load_all.permitt_diff, load_all.permitt_diff_cat, load_all.permitt_diff_std, load_all.permitt_diff_std_cat, load_all.permitt_real_trim, load_all.permitt_imag_trim, load_all.activ_relax, load_all.activ_relax_poly, load_all.activ_dc, load_all.activ_dc_poly);
+                [period_relax, period_relax_std] ...
+                            = deal(cell(num_temp, 1));
+                for ii = 1:num_temp
+                    [period_relax{ii}, period_relax_std{ii}] ...
+                            = deal((1 ./ ((2 * pi) .* freq_relax{ii})), (1 ./ ((2 * pi) .* freq_relax_std{ii})));
+                end
+                period_relax_cat ...
+                            = 1 ./ ((2 * pi) .* freq_relax_cat);
+                for ii = 1:4
+                    period_relax_std_cat{ii} ...
+                            = 1 ./ ((2 * pi) .* freq_relax_std_cat{ii});
+                end
+            end
+            set(weight_check, 'value', double(do_weight))
+            set(freq_min_edit, 'string', sprintf(relax_str{2}, freq_min))
+            set(freq_min_slide, 'value', log10(freq_min))
+            set(freq_max_edit, 'string', sprintf(relax_str{2}, freq_max))
+            set(freq_max_slide, 'value', log10(freq_max))
+            set(permitt_hf_slide, 'value', permitt_hf_guess)
+            set(permitt_hf_edit, 'string', sprintf(relax_str{1}, permitt_hf_guess))
+            set(conduct_dc_slide, 'value', log10(conduct_dc_guess))
+            set(conduct_dc_edit, 'string', sprintf(relax_str{2}, conduct_dc_guess))
+            set(conduct_dc_check, 'value', double(do_dc(1)))
+            set(relax_group, 'selectedobject', relax_check(num_relax(1)))
+            for ii = 1:3
+                for jj = 1:4
+                    if (ii == 2)
+                        if (get(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'min') > log10(relax_guess(jj, ii)))
+                            set(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'min', log10(relax_guess(jj, ii)))
+                        elseif (get(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'max') < log10(relax_guess(jj, ii)))
+                            set(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'max', log10(relax_guess(jj, ii)))
+                        end                        
+                        set(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'value', log10(relax_guess(jj, ii)))
+                    else
+                        if (get(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'min') > relax_guess(jj, ii))
+                            set(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'min', relax_guess(jj, ii))
+                        elseif (get(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'max') < relax_guess(jj, ii))
+                            set(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'max', relax_guess(jj, ii))
+                        end
+                        set(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'value', relax_guess(jj, ii))
+                    end
+                    set(eval([relax_simple{ii} '_edit(' num2str(jj) ')']), 'string', sprintf(relax_str{ii}, relax_guess(jj, ii)))
+                end
+            end
+            for ii = 1:4
+                set(period_relax_edit(ii), 'string', num2str(1 / (2 * pi * relax_guess(ii, 2))))
+            end
             temp_str        = cell(num_temp, 1);
-            % put all temperatures in the pull-down menu
+            inv_done        = false(1, num_temp);
             for ii = 1:num_temp
                 temp_str{ii} ...
                             = num2str(round(temp_mean(ii)));
+                if ~isempty(model_final{ii})
+                    temp_str{ii} ...
+                            = [temp_str{ii} 'X'];
+                    inv_done(ii) ...
+                            = true;
+                end
             end
             set(temp_box, 'string', temp_str)
-            
-            % initialize a whole bunch of variables now that we have num_temp (note they start life as NaNs not zeros)
-            [permitt_hf, conduct_hf, conduct_dc, conduct_hf_model, permitt_hf_model, res_def, chisq_diff, num_param, res_model, length_freq] ...
-                            = deal(NaN(num_temp, 1));
-            for ii = 1:num_temp
-                length_freq(ii) ...
-                            = length(freq{ii});
-            end
-            [permitt_hf_model_std, conduct_dc_std] ...
-                            = deal(NaN(num_temp, 2));
-            [freq_trim, permitt_real_trim, permitt_imag_trim, conduct_trim, weight_freq, model_guess, permitt_real_model, permitt_imag_model, conduct_model, phase_model, model_final, permitt_diff, freq_relax, alpha_cole, permitt_real_model_full, permitt_imag_model_full, conduct_model_full, ...
-             phase_model_full, model_std, permitt_diff_std, freq_relax_std, alpha_cole_std, model_min, model_max, permitt_real_model_sep, permitt_imag_model_sep, conduct_model_sep, period_relax, period_relax_std] ...
-                            = deal(cell(num_temp, 1));
-            [permitt_diff_cat, freq_relax_cat, alpha_cole_cat, period_relax_cat] ...
-                            = deal(NaN(4, num_temp));
-            for ii = 1:4
-                [permitt_diff_std_cat{ii}, freq_relax_std_cat{ii}, alpha_cole_std_cat{ii}, period_relax_std_cat{ii}] ...
-                            = deal(NaN(num_temp, 2));
-            end
-            num_relax       = 2 .* ones(1, num_temp); % default to two relaxations
-            [do_dc, inv_done] ...
-                            = deal(false(1, num_temp)); % default no DC conductivity
-            
-            temp_mean_alt   = (1 / (temp_mean(1) + 273.15)) - (1 ./ (temp_mean + 273.15)); % Arrhenius inverse temperature of temp_mean
-            
-            % odds and ends for fit plot
-            temp_min        = min(temp_mean) - mod(min(temp_mean), 10) - 10;
-            temp_max        = max(temp_mean) - mod(max(temp_mean), 10) + 10;
-            temp_vec        = temp_min:10:temp_max;
-            temp_inv_vec    = 1e3 ./ (temp_vec + 273.15);
-            temp_mean_inv   = 1e3 ./ (temp_mean + 273.15);
-            
-            set(temp_box, 'value', 1)
-            set(inv_tot, 'string', num2str(num_temp))
-            
-            plot_data % plot the first (should be lowest) temperature 
         end
+        curr_temp           = 1;
+        num_inv             = length(find(~isnan(res_model)));
+        set(inv_done_edit, 'string', [num2str(num_inv) ' /'])
+        inv_report
+        plot_fits
+        do_fm
+        
     end
 
 %% plot a single temperature's data
@@ -381,12 +484,16 @@ figure(inv_gui)
         for ii = 1:4 %#ok<*FXUP>
             axes(ax(ii)) %#ok<*LAXES>
             if (ii < 4)
-                p_data(ii, 1)   = loglog(freq{curr_temp}, eval(plots1{ii}), 'r', 'linewidth', 2);
-                p_data(ii, 2)   = loglog(freq{curr_temp}, eval(plots1{ii}), 'ko', 'markerfacecolor', 'r', 'markersize', 8);
+                p_data(ii, 1) ...
+                            = loglog(freq{curr_temp}, eval(plots1{ii}), 'r', 'linewidth', 2);
+                p_data(ii, 2) ...
+                            = loglog(freq{curr_temp}, eval(plots1{ii}), 'ko', 'markerfacecolor', 'r', 'markersize', 8, 'linewidth', 1);
                 set(ax(ii), 'ylim', [min(eval(plots1{ii})) max(eval(plots1{ii}))])
             else
-                p_data(ii, 1)   = semilogx(freq{curr_temp}, eval(plots1{ii}), 'r', 'linewidth', 2);
-                p_data(ii, 2)   = semilogx(freq{curr_temp}, eval(plots1{ii}), 'ko', 'markerfacecolor', 'r', 'markersize', 8);
+                p_data(ii, 1) ...
+                            = semilogx(freq{curr_temp}, eval(plots1{ii}), 'r', 'linewidth', 2);
+                p_data(ii, 2) ...
+                            = semilogx(freq{curr_temp}, eval(plots1{ii}), 'ko', 'markerfacecolor', 'r', 'markersize', 8, 'linewidth', 1);
             end
         end
         xlim([min(freq{curr_temp}) max(freq{curr_temp})]) % restrict x axis to current data's limits
@@ -399,14 +506,8 @@ figure(inv_gui)
             set(freq_max_slide, 'value', log10(max(freq_trim{curr_temp})))
             inv_report
         else
-            set(inv_edit, 'string', '')
-            set(permitt_hf_box, 'string', '')
-            set(conduct_dc_box, 'string', '')
-            for ii = 1:num_relax(curr_temp)
-                set(permitt_diff_box(ii), 'string', '')
-                set(freq_relax_box(ii), 'string', '')
-                set(alpha_cole_box(ii), 'string', '')
-            end
+            set([inv_edit, permitt_hf_box conduct_dc_box], 'string', '')
+            set([permitt_diff_box freq_relax_box alpha_cole_box], 'string', '')
         end
         slide_freq_min
         slide_freq_max
@@ -523,7 +624,7 @@ figure(inv_gui)
             if (ii < 4)
                 p_model(ii) = loglog(freq{curr_temp}, eval(plots2{ii}), 'b--', 'linewidth', 2);
             else
-                p_model(ii) = semilogy(freq{curr_temp}, eval(plots2{ii}), 'b--', 'linewidth', 2);
+                p_model(ii) = semilogx(freq{curr_temp}, eval(plots2{ii}), 'b--', 'linewidth', 2);
             end
         end
         
@@ -549,12 +650,8 @@ figure(inv_gui)
             focus_check     = true;
         end
         
-        if any(ishandle(p_model(:)))
-            delete(p_model(ishandle(p_model(:))))
-        end
-        if any(ishandle(p_model_sep(:)))
-            delete(p_model_sep(ishandle(p_model_sep(:))))
-        end
+        delete(p_model(ishandle(p_model(:))))
+        delete(p_model_sep(ishandle(p_model_sep(:))))
         
         % get data's HF permittivity and conductivity from first frequency (should be highest)
         [permitt_hf(curr_temp), conduct_hf(curr_temp)] ...
@@ -565,11 +662,7 @@ figure(inv_gui)
         if ~isempty(get(conduct_dc_box, 'string'))
             set(conduct_dc_box, 'string', '')
         end
-        for ii = 1:4
-            set(permitt_diff_box(ii), 'string', '')
-            set(freq_relax_box(ii), 'string', '')
-            set(alpha_cole_box(ii), 'string', '')
-        end
+        set([permitt_diff_box freq_relax_box alpha_cole_box], 'string', '')
         
         % assign model min/max based on current number of relaxations
         model_min{curr_temp}= model_min_abs(1:(1 + (3 * num_relax(curr_temp))));
@@ -702,12 +795,13 @@ figure(inv_gui)
         do_activ
         plot_fits % plot fit parameters in separate sub-function
         if ~isempty(file_save)
-            save_cfg_vars
-            save_vars
+            save_cfg_var
+            save_var
         end
     end
 
 %% calculate simple (all temperatures) activation energies of each relaxation frequency and DC conductivity
+
     function do_activ(source, eventdata)
         for ii = 1:max(num_relax)
             curr_ind    = find(~isnan(freq_relax_cat(ii, :)));
@@ -732,6 +826,7 @@ figure(inv_gui)
     end
 
 %% report inverse results
+
     function inv_report(source, eventdata)
         
         figure(inv_gui)
@@ -792,18 +887,10 @@ figure(inv_gui)
 
     function plot_fits(source, eventdata)
         figure(arr_fig)
-        if any(ishandle(p_arr_fit(:)))
-            delete(p_arr_fit(ishandle(p_arr_fit(:))))
-        end
-        if any(ishandle(p_arr_err(:)))
-            delete(p_arr_err(ishandle(p_arr_err(:))))
-        end
-        if any(ishandle(p_arr_model(:)))
-            delete(p_arr_model(ishandle(p_arr_model(:))))
-        end
-        if any(ishandle(p_arr_leg(:)))
-            delete(p_arr_leg(ishandle(p_arr_leg(:))))
-        end
+        delete(p_arr_fit(ishandle(p_arr_fit(:))))
+        delete(p_arr_err(ishandle(p_arr_err(:))))
+        delete(p_arr_model(ishandle(p_arr_model(:))))
+        delete(p_arr_leg(ishandle(p_arr_leg(:))))
         if ishandle(pdcf)
             delete(pdcf)
         end
@@ -907,113 +994,8 @@ figure(inv_gui)
         end
     end
 
-%% load configuration file
-
-    function load_cfg(source, eventdata)
-        if ~focus_check
-            focus_check     = true;
-        end
-        if ~isempty(path_curr)
-            [file_merge, path_curr] ...
-                            = uigetfile('*.mat', 'Load configuration:', path_curr);
-        else
-            [file_merge, path_curr] ...
-                            = uigetfile('*.mat', 'Load configuration:');
-        end
-        if ~file_merge
-            [file_merge, path_curr] ...
-                            = deal('');
-        end
-        if ~isempty(file_merge)
-            load_all        = load([path_curr file_merge]);
-            try
-                [freq_min, freq_max, freq_trim, do_weight, weight_freq, num_relax, do_dc, relax_guess, model_guess, permitt_hf_guess, conduct_dc_guess, model_final, permitt_hf, permitt_hf_model, permitt_hf_model_std, conduct_hf, conduct_hf_model, conduct_dc, conduct_dc_std, ...
-                 permitt_real_model, permitt_imag_model, conduct_model, phase_model, res_model, freq_relax, freq_relax_cat, freq_relax_std, freq_relax_std_cat, alpha_cole, alpha_cole_cat, alpha_cole_std, alpha_cole_std_cat, permitt_diff, permitt_diff_cat, permitt_diff_std, ...
-                 permitt_diff_std_cat, permitt_real_trim, permitt_imag_trim, activ_relax, activ_relax_poly, activ_dc, activ_dc_poly, period_relax, period_relax_std, period_relax_cat, period_relax_std_cat] ...
-                            = deal(load_all.freq_min, load_all.freq_max, load_all.freq_trim, load_all.do_weight, load_all.weight_freq, load_all.num_relax, load_all.do_dc, load_all.relax_guess, load_all.model_guess, load_all.permitt_hf_guess, load_all.conduct_dc_guess, load_all.model_final, ...
-                                   load_all.permitt_hf, load_all.permitt_hf_model, load_all.permitt_hf_model_std, load_all.conduct_hf, load_all.conduct_hf_model, load_all.conduct_dc, load_all.conduct_dc_std, load_all.permitt_real_model, load_all.permitt_imag_model, load_all.conduct_model, ...
-                                   load_all.phase_model, load_all.res_model, load_all.freq_relax, load_all.freq_relax_cat, load_all.freq_relax_std, load_all.freq_relax_std_cat, load_all.alpha_cole, load_all.alpha_cole_cat, load_all.alpha_cole_std, load_all.alpha_cole_std_cat, ...
-                                   load_all.permitt_diff, load_all.permitt_diff_cat, load_all.permitt_diff_std, load_all.permitt_diff_std_cat, load_all.permitt_real_trim, load_all.permitt_imag_trim, load_all.activ_relax, load_all.activ_relax_poly, load_all.activ_dc, load_all.activ_dc_poly, ...
-                                   load_all.period_relax, load_all.period_relax_std, load_all.period_relax_cat, load_all.period_relax_std_cat);
-            catch %#ok<CTCH>
-                [freq_min, freq_max, freq_trim, do_weight, weight_freq, num_relax, do_dc, relax_guess, model_guess, permitt_hf_guess, conduct_dc_guess, model_final, permitt_hf, permitt_hf_model, permitt_hf_model_std, conduct_hf, conduct_hf_model, conduct_dc, conduct_dc_std, ...
-                 permitt_real_model, permitt_imag_model, conduct_model, phase_model, res_model, freq_relax, freq_relax_cat, freq_relax_std, freq_relax_std_cat, alpha_cole, alpha_cole_cat, alpha_cole_std, alpha_cole_std_cat, permitt_diff, permitt_diff_cat, permitt_diff_std, ...
-                 permitt_diff_std_cat, permitt_real_trim, permitt_imag_trim, activ_relax, activ_relax_poly, activ_dc, activ_dc_poly] ...
-                            = deal(load_all.freq_min, load_all.freq_max, load_all.freq_trim, load_all.do_weight, load_all.weight_freq, load_all.num_relax, load_all.do_dc, load_all.relax_guess, load_all.model_guess, load_all.permitt_hf_guess, load_all.conduct_dc_guess, load_all.model_final, ...
-                                   load_all.permitt_hf, load_all.permitt_hf_model, load_all.permitt_hf_model_std, load_all.conduct_hf, load_all.conduct_hf_model, load_all.conduct_dc, load_all.conduct_dc_std, load_all.permitt_real_model, load_all.permitt_imag_model, load_all.conduct_model, ...
-                                   load_all.phase_model, load_all.res_model, load_all.freq_relax, load_all.freq_relax_cat, load_all.freq_relax_std, load_all.freq_relax_std_cat, load_all.alpha_cole, load_all.alpha_cole_cat, load_all.alpha_cole_std, load_all.alpha_cole_std_cat, ...
-                                   load_all.permitt_diff, load_all.permitt_diff_cat, load_all.permitt_diff_std, load_all.permitt_diff_std_cat, load_all.permitt_real_trim, load_all.permitt_imag_trim, load_all.activ_relax, load_all.activ_relax_poly, load_all.activ_dc, load_all.activ_dc_poly);
-                [period_relax, period_relax_std] ...
-                            = deal(cell(num_temp, 1));
-                for ii = 1:num_temp
-                    [period_relax{ii}, period_relax_std{ii}] ...
-                            = deal((1 ./ ((2 * pi) .* freq_relax{ii})), (1 ./ ((2 * pi) .* freq_relax_std{ii})));
-                end
-                period_relax_cat ...
-                            = 1 ./ ((2 * pi) .* freq_relax_cat);
-                for ii = 1:4
-                    period_relax_std_cat{ii} ...
-                            = 1 ./ ((2 * pi) .* freq_relax_std_cat{ii});
-                end
-            end
-            set(weight_check, 'value', double(do_weight))
-            set(freq_min_edit, 'string', sprintf(relax_str{2}, freq_min))
-            set(freq_min_slide, 'value', log10(freq_min))
-            set(freq_max_edit, 'string', sprintf(relax_str{2}, freq_max))
-            set(freq_max_slide, 'value', log10(freq_max))
-            set(permitt_hf_slide, 'value', permitt_hf_guess)
-            set(permitt_hf_edit, 'string', sprintf(relax_str{1}, permitt_hf_guess))
-            set(conduct_dc_slide, 'value', log10(conduct_dc_guess))
-            set(conduct_dc_edit, 'string', sprintf(relax_str{2}, conduct_dc_guess))
-            set(conduct_dc_check, 'value', double(do_dc(1)))
-            set(relax_group, 'selectedobject', relax_check(num_relax(1)))
-            for ii = 1:3
-                for jj = 1:4
-                    if (ii == 2)
-                        if (get(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'min') > log10(relax_guess(jj, ii)))
-                            set(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'min', log10(relax_guess(jj, ii)))
-                        elseif (get(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'max') < log10(relax_guess(jj, ii)))
-                            set(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'max', log10(relax_guess(jj, ii)))
-                        end                        
-                        set(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'value', log10(relax_guess(jj, ii)))
-                    else
-                        if (get(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'min') > relax_guess(jj, ii))
-                            set(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'min', relax_guess(jj, ii))
-                        elseif (get(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'max') < relax_guess(jj, ii))
-                            set(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'max', relax_guess(jj, ii))
-                        end
-                        set(eval([relax_simple{ii} '_slide(' num2str(jj) ')']), 'value', relax_guess(jj, ii))
-                    end
-                    set(eval([relax_simple{ii} '_edit(' num2str(jj) ')']), 'string', sprintf(relax_str{ii}, relax_guess(jj, ii)))
-                end
-            end
-            for ii = 1:4
-                set(period_relax_edit(ii), 'string', num2str(1 / (2 * pi * relax_guess(ii, 2))))
-            end
-            temp_str        = cell(num_temp, 1);
-            inv_done        = false(1, num_temp);
-            for ii = 1:num_temp
-                temp_str{ii} ...
-                            = num2str(round(temp_mean(ii)));
-                if ~isempty(model_final{ii})
-                    temp_str{ii} ...
-                            = [temp_str{ii} 'X'];
-                    inv_done(ii) ...
-                            = true;
-                end
-            end
-            set(temp_box, 'string', temp_str)
-        end
-        curr_temp           = 1;
-        num_inv             = length(find(~isnan(res_model)));
-        set(inv_done_edit, 'string', [num2str(num_inv) ' /'])
-        inv_report
-        plot_fits
-        do_fm
-        
-    end
-
 %% save configuration file
+
     function save_cfg(source, eventdata)
         if ~focus_check
             focus_check     = true;
@@ -1030,13 +1012,13 @@ figure(inv_gui)
                             = deal('');
         end
         if ~isempty(file_save)
-            save_cfg_vars
+            save_cfg_var
         end
     end
 
 %% save configuration variables
 
-    function save_cfg_vars(source, eventdata)
+    function save_cfg_var(source, eventdata)
         save([path_curr file_save], 'freq_min', 'freq_max', 'freq_trim', 'do_weight', 'weight_freq', 'num_relax', 'do_dc', 'relax_guess', 'model_guess', 'permitt_hf_guess', 'conduct_dc_guess', 'model_final', 'permitt_hf', 'permitt_hf_model', 'permitt_hf_model_std', 'conduct_hf', ...
                                     'conduct_hf_model', 'conduct_dc', 'conduct_dc_std', 'permitt_real_model', 'permitt_imag_model', 'conduct_model', 'phase_model', 'res_model', 'freq_relax', 'freq_relax_cat', 'freq_relax_std', 'freq_relax_std_cat', 'alpha_cole', 'alpha_cole_cat', ...
                                     'alpha_cole_std', 'alpha_cole_std_cat', 'permitt_diff', 'permitt_diff_cat', 'permitt_diff_std', 'permitt_diff_std_cat', 'permitt_real_trim', 'permitt_imag_trim', 'activ_relax', 'activ_relax_poly', 'activ_dc', 'activ_dc_poly', 'period_relax', ...
@@ -1059,13 +1041,13 @@ figure(inv_gui)
                             = deal('');
         end
         if ~isempty(file_save)
-            save_vars
+            save_var
         end
     end
     
 %% save inverse variables
 
-    function save_vars(source, eventdata)
+    function save_var(source, eventdata)
         save([path_curr file_save], 'num_temp', 'temp_mean', 'temp_std', 'freq_trim', 'do_weight', 'weight_freq', 'num_relax', 'do_dc', 'model_final', 'permitt_hf', 'permitt_hf_model', 'permitt_hf_model_std', 'conduct_hf', 'conduct_hf_model', 'conduct_dc', 'conduct_dc_std', ...
                                     'permitt_real_model', 'permitt_imag_model', 'conduct_model', 'phase_model', 'res_model', 'freq_relax', 'freq_relax_cat', 'freq_relax_std', 'freq_relax_std_cat', 'alpha_cole', 'alpha_cole_cat', 'alpha_cole_std', 'alpha_cole_std_cat', 'permitt_diff', ...
                                     'permitt_diff_cat', 'permitt_diff_std', 'permitt_diff_std_cat', 'permitt_real_trim', 'permitt_imag_trim', 'activ_relax', 'activ_relax_poly', 'activ_dc', 'activ_dc_poly', 'period_relax', 'period_relax_std', 'period_relax_cat', 'period_relax_std_cat')
@@ -1096,9 +1078,8 @@ figure(inv_gui)
         if (data_loaded && (length(tmp1) == 1)) % only want to redo forward model if actually adjusting frequency
             do_fm
         end
-        
     end
-
+%%
     function slide_freq_max(source, eventdata)
         if ~focus_check
             focus_check     = true;
@@ -1122,29 +1103,8 @@ figure(inv_gui)
         if (data_loaded && (length(tmp1) == 1));
             do_fm
         end
-        
     end
-
-    function slide_permitt_hf(source, eventdata)
-        if ~focus_check
-            focus_check     = true;
-        end
-        permitt_hf_guess    = get(permitt_hf_slide, 'value');
-        set(permitt_hf_edit, 'string', sprintf(relax_str{1}, permitt_hf_guess))
-        if data_loaded
-            do_fm
-        end
-        
-    end
-
-    function slide_conduct_dc(source, eventdata)
-        conduct_dc_guess    = 10 ^ get(conduct_dc_slide, 'value');
-        set(conduct_dc_edit, 'string', sprintf(relax_str{2}, conduct_dc_guess))
-        if (data_loaded && (do_dc(curr_temp)))
-            do_fm
-        end
-    end
-
+%%
     function check_dc(source, eventdata) % update checkbox for DC conductivity
         if ~focus_check
             focus_check     = true;
@@ -1155,179 +1115,16 @@ figure(inv_gui)
         end
         do_dc(isnan(permitt_hf_model)) ...
                             = do_dc(curr_temp);
-        
     end
-
-    function relax_radio(~, eventdata) % update radio number of relaxations
-        if ~focus_check
-            focus_check     = true;
-        end
-        num_relax(curr_temp)= str2double(get(eventdata.NewValue, 'string'));
-        if data_loaded
-            do_fm
-        end
-        num_relax(isnan(permitt_hf_model)) ...
-                            = num_relax(curr_temp);
-        
-    end
-
-    function slide_permitt_diff_1(source, eventdata) %#ok<*DEFNU> % update all the sliders
-        if ~focus_check
-            focus_check     = true;
-        end
-        relax_guess(1, 1)   = get(permitt_diff_slide(1), 'value');
-        set(permitt_diff_edit(1), 'string', sprintf(relax_str{1}, relax_guess(1, 1)))
-        if data_loaded
-            do_fm
-        end
-        
-    end
-
-    function slide_permitt_diff_2(source, eventdata)
-        if ~focus_check
-            focus_check     = true;
-        end
-        relax_guess(2, 1)   = get(permitt_diff_slide(2), 'value');
-        set(permitt_diff_edit(2), 'string', sprintf(relax_str{1}, relax_guess(2, 1)))
-        if (data_loaded && (num_relax(curr_temp) >= 2))
-            do_fm
-        end
-        
-    end
-
-    function slide_permitt_diff_3(source, eventdata)
-        if ~focus_check
-            focus_check     = true;
-        end
-        relax_guess(3, 1)   = get(permitt_diff_slide(3), 'value');
-        set(permitt_diff_edit(3), 'string', sprintf(relax_str{1}, relax_guess(3, 1)))
-        if (data_loaded && (num_relax(curr_temp) >= 3))
-            do_fm
-        end
-        
-    end
-
-    function slide_permitt_diff_4(source, eventdata)
-        if ~focus_check
-            focus_check     = true;
-        end
-        relax_guess(4, 1)   = get(permitt_diff_slide(4), 'value');
-        set(permitt_diff_edit(4), 'string', sprintf(relax_str{1}, relax_guess(4, 1)))
-        if (data_loaded && (num_relax(curr_temp) >= 4))
-            do_fm
-        end
-        
-    end
-
-    function slide_freq_relax_1(source, eventdata)
-        if ~focus_check
-            focus_check     = true;
-        end
-        relax_guess(1, 2)   = 10 ^ get(freq_relax_slide(1), 'value');
-        set(freq_relax_edit(1), 'string', sprintf(relax_str{2}, relax_guess(1, 2)))
-        set(period_relax_edit(1), 'string', num2str(1 / (2 * pi * relax_guess(1, 2))))
-        if data_loaded
-            do_fm
-        end
-        
-    end
-
-    function slide_freq_relax_2(source, eventdata)
-        if ~focus_check
-            focus_check     = true;
-        end
-        relax_guess(2, 2)   = 10 ^ get(freq_relax_slide(2), 'value');
-        set(freq_relax_edit(2), 'string', sprintf(relax_str{2}, relax_guess(2, 2)))
-        set(period_relax_edit(2), 'string', num2str(1 / (2 * pi * relax_guess(2, 2))))        
-        if (data_loaded && (num_relax(curr_temp) >= 2))
-            do_fm
-        end
-        
-    end
-
-    function slide_freq_relax_3(source, eventdata)
-        if ~focus_check
-            focus_check     = true;
-        end
-        relax_guess(3, 2)   = 10 ^ get(freq_relax_slide(3), 'value');
-        set(freq_relax_edit(3), 'string', sprintf(relax_str{2}, relax_guess(3, 2)))
-        set(period_relax_edit(3), 'string', num2str(1 / (2 * pi * relax_guess(3, 2))))        
-        if (data_loaded && (num_relax(curr_temp) >= 3))
-            do_fm
-        end
-        
-    end
-
-    function slide_freq_relax_4(source, eventdata)
-        if ~focus_check
-            focus_check     = true;
-        end
-        relax_guess(4, 2)   = 10 ^ get(freq_relax_slide(4), 'value');
-        set(freq_relax_edit(4), 'string', sprintf(relax_str{2}, relax_guess(4, 2)))
-        set(period_relax_edit(4), 'string', num2str(1 / (2 * pi * relax_guess(4, 2))))        
-        if (data_loaded && (num_relax(curr_temp) >= 4))
-            do_fm
-        end
-        
-    end
-
-    function slide_alpha_cole_1(source, eventdata)
-        if ~focus_check
-            focus_check     = true;
-        end
-        relax_guess(1, 3)   = get(alpha_cole_slide(1), 'value');
-        set(alpha_cole_edit(1), 'string', sprintf(relax_str{3}, relax_guess(1, 3)))
-        if data_loaded
-            do_fm
-        end
-        
-    end
-
-    function slide_alpha_cole_2(source, eventdata)
-        if ~focus_check
-            focus_check     = true;
-        end
-        relax_guess(2, 3)   = get(alpha_cole_slide(2), 'value');
-        set(alpha_cole_edit(2), 'string', sprintf(relax_str{3}, relax_guess(2, 3)))
-        if (data_loaded && (num_relax(curr_temp) >= 2))
-            do_fm
-        end
-        
-    end
-
-    function slide_alpha_cole_3(source, eventdata)
-        if ~focus_check
-            focus_check     = true;
-        end
-        relax_guess(3, 3)   = get(alpha_cole_slide(3), 'value');
-        set(alpha_cole_edit(3), 'string', sprintf(relax_str{3}, relax_guess(3, 3)))
-        if (data_loaded && (num_relax(curr_temp) >= 3))
-            do_fm
-        end
-        
-    end
-
-    function slide_alpha_cole_4(source, eventdata)
-        if ~focus_check
-            focus_check     = true;
-        end
-        relax_guess(4, 3)   = get(alpha_cole_slide(4), 'value');
-        set(alpha_cole_edit(4), 'string', sprintf(relax_str{3}, relax_guess(4, 3)))
-        if (data_loaded && (num_relax(curr_temp) >= 4))
-            do_fm
-        end
-        
-    end
-    
+%%
     function check_weight(source, eventdata) % update checkbox for frequency weighting
         if ~focus_check
             focus_check     = true;
         end
-        do_weight           = logical(get(weight_check, 'value'));
-        
+        do_weight           = logical(get(weight_check, 'value')); 
     end
-
-    function check_sep(source, eventdata) % update checkbox for frequency weighting
+%%
+    function check_sep(source, eventdata) % update checkbox for inversion separation
         if ~focus_check
             focus_check     = true;
         end
@@ -1339,9 +1136,133 @@ figure(inv_gui)
         else
             disp_sep
         end
-        
+    end
+%%
+    function relax_radio(~, eventdata) % update number of relaxations
+        if ~focus_check
+            focus_check     = true;
+        end
+        num_relax(curr_temp)= str2double(get(eventdata.NewValue, 'string'));
+        if data_loaded
+            do_fm
+        end
+        num_relax(isnan(permitt_hf_model)) ...
+                            = num_relax(curr_temp);
+    end
+%%
+    function slide_permitt_hf(source, eventdata)
+        if ~focus_check
+            focus_check     = true;
+        end
+        permitt_hf_guess    = get(permitt_hf_slide, 'value');
+        set(permitt_hf_edit, 'string', sprintf(relax_str{1}, permitt_hf_guess))
+        if data_loaded
+            do_fm
+        end
+    end
+%%
+    function slide_conduct_dc(source, eventdata)
+        conduct_dc_guess    = 10 ^ get(conduct_dc_slide, 'value');
+        set(conduct_dc_edit, 'string', sprintf(relax_str{2}, conduct_dc_guess))
+        if (data_loaded && (do_dc(curr_temp)))
+            do_fm
+        end
+    end
+%%
+    function slide_permitt_diff_1(source, eventdata) %#ok<*DEFNU> % update permitt_diff sliders
+        tmp1                = 1;
+        slide_permitt_diff
     end
 
+    function slide_permitt_diff_2(source, eventdata)
+        tmp1                = 2;
+        slide_permitt_diff
+    end
+
+    function slide_permitt_diff_3(source, eventdata)
+        tmp1                = 3;
+        slide_permitt_diff
+    end
+
+    function slide_permitt_diff_4(source, eventdata)
+        tmp1                = 4;
+        slide_permitt_diff
+    end
+
+    function slide_permitt_diff(source, eventdata)
+        if ~focus_check
+            focus_check     = true;
+        end
+        relax_guess(tmp1, 1)= get(permitt_diff_slide(tmp1), 'value');
+        set(permitt_diff_edit(tmp1), 'string', sprintf(relax_str{1}, relax_guess(tmp1, 1)))
+        if (data_loaded && (num_relax(curr_temp) >= tmp1))
+            do_fm
+        end
+    end
+%%
+    function slide_freq_relax_1(source, eventdata)
+        tmp1                = 1;
+        slide_freq_relax
+    end
+
+    function slide_freq_relax_2(source, eventdata)
+        tmp1                = 2;
+        slide_freq_relax
+    end
+
+    function slide_freq_relax_3(source, eventdata)
+        tmp1                = 3;
+        slide_freq_relax
+    end
+
+    function slide_freq_relax_4(source, eventdata)
+        tmp1                = 4;
+        slide_freq_relax
+    end
+
+    function slide_freq_relax(source, eventdata)
+        if ~focus_check
+            focus_check     = true;
+        end
+        relax_guess(tmp1, 2)= 10 ^ get(freq_relax_slide(tmp1), 'value');
+        set(freq_relax_edit(tmp1), 'string', sprintf(relax_str{2}, relax_guess(tmp1, 2)))
+        set(period_relax_edit(tmp1), 'string', num2str(1 / (2 * pi * relax_guess(tmp1, 2))))
+        if (data_loaded && (num_relax(curr_temp) >= tmp1))
+            do_fm
+        end
+    end
+%%
+    function slide_alpha_cole_1(source, eventdata)
+        tmp1                = 1;
+        slide_alpha_cole
+    end
+
+    function slide_alpha_cole_2(source, eventdata)
+        tmp1                = 2;
+        slide_alpha_cole
+    end
+
+    function slide_alpha_cole_3(source, eventdata)
+        tmp1                = 3;
+        slide_alpha_cole
+    end
+
+    function slide_alpha_cole_4(source, eventdata)
+        tmp1                = 4;
+        slide_alpha_cole
+    end
+
+    function slide_alpha_cole(source, eventdata)
+        if ~focus_check
+            focus_check     = true;
+        end
+        relax_guess(tmp1, 3)= get(alpha_cole_slide(tmp1), 'value');
+        set(alpha_cole_edit(tmp1), 'string', sprintf(relax_str{3}, relax_guess(tmp1, 3)))
+        if (data_loaded && (num_relax(curr_temp) >= tmp1))
+            do_fm
+        end
+    end
+%%
     function weight(source, eventdata)
         weight_freq{curr_temp} ...
                             = [(max(permitt_real_trim{curr_temp}) ./ permitt_real_trim{curr_temp}) (max(permitt_imag_trim{curr_temp}) ./ permitt_imag_trim{curr_temp})];
@@ -1352,7 +1273,7 @@ figure(inv_gui)
         weight_freq{curr_temp} ...
                             = reshape(weight_freq{curr_temp}, numel(weight_freq{curr_temp}), 1);
     end
-    
+%%    
     function param_test(source, eventdata)
         param_tmp           = linspace((model_final{curr_temp}(curr_param) - (frac_test(curr_range) * model_final{curr_temp}(curr_param))), (model_final{curr_temp}(curr_param) + (frac_test(curr_range) * model_final{curr_temp}(curr_param))));
         model_tmp           = model_final{curr_temp};
@@ -1374,7 +1295,7 @@ figure(inv_gui)
             end
         end
     end
-
+%%
     function nuke_plot(source, eventdata)
         if ~focus_check
             focus_check     = true;
@@ -1400,9 +1321,8 @@ figure(inv_gui)
         if data_loaded
             do_fm
         end
-        
     end
-
+%%
     function nuke_inv(source, eventdata)
         if ~focus_check
             focus_check     = true;
@@ -1427,23 +1347,17 @@ figure(inv_gui)
                             = temp_str{curr_temp}(1:(end - 1));
             set(temp_box, 'string', temp_str)
         end
-        set(inv_edit, 'string', '')
-        set(permitt_hf_box, 'string', '')
+        set([inv_edit permitt_hf_box], 'string', '')
         if do_dc(curr_temp)
             set(conduct_dc_box, 'string', '')
         end
-        for ii = 1:4
-            set(permitt_diff_box(ii), 'string', '')
-            set(freq_relax_box(ii), 'string', '')
-            set(alpha_cole_box(ii), 'string', '')
-        end
+        set([permitt_diff_box freq_relax_box alpha_cole_box], 'string', '')
         if num_inv
             do_activ
             plot_fits
         end
-        
     end
-
+%%
     function do_next(source, eventdata)
         if ~focus_check
             focus_check     = true;
@@ -1456,9 +1370,8 @@ figure(inv_gui)
                 do_inv
             end
         end
-        
     end
-
+%%
     function disp_sep(source, eventdata)
         % plot separated forward model
         for ii = 1:3
@@ -1474,115 +1387,87 @@ figure(inv_gui)
             end
         end
     end
-
+%%
     function lim_permitt_diff_1(source, eventdata)
-        dia                 = dialog;
-        curr_slide          = 1;
-        annotation('textbox', [0.4 0.75 0.1 0.1], 'string', [relax_labels{1} '(1) min'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp1                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.6 0.2 0.1], 'fontsize', 16, 'string', num2str(permitt_diff_min_1), 'callback', @adj_permitt_diff_min);
-        annotation('textbox', [0.4 0.35 0.1 0.1], 'string', [relax_labels{1} '(1) max'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp2                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.2 0.2 0.1], 'fontsize', 16, 'string', num2str(permitt_diff_max_1), 'callback', @adj_permitt_diff_max);
+        [curr_relax_var, curr_slide] ...
+                            = deal(1, 1);
+        lim_gen
     end
 
     function lim_permitt_diff_2(source, eventdata)
-        dia                 = dialog;
-        curr_slide          = 2;
-        annotation('textbox', [0.4 0.75 0.1 0.1], 'string', [relax_labels{1} '(2) min'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp1                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.6 0.2 0.1], 'fontsize', 16, 'string', num2str(permitt_diff_min_2), 'callback', @adj_permitt_diff_min);
-        annotation('textbox', [0.4 0.35 0.1 0.1], 'string', [relax_labels{1} '(2) max'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp2                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.2 0.2 0.1], 'fontsize', 16, 'string', num2str(permitt_diff_max_2), 'callback', @adj_permitt_diff_max);
+        [curr_relax_var, curr_slide] ...
+                            = deal(1, 2);
+        lim_gen
     end
 
     function lim_permitt_diff_3(source, eventdata)
-        dia                 = dialog;
-        curr_slide          = 3;
-        annotation('textbox', [0.4 0.75 0.1 0.1], 'string', [relax_labels{1} '(3) min'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp1                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.6 0.2 0.1], 'fontsize', 16, 'string', num2str(permitt_diff_min_3), 'callback', @adj_permitt_diff_min);
-        annotation('textbox', [0.4 0.35 0.1 0.1], 'string', [relax_labels{1} '(3) max'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp2                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.2 0.2 0.1], 'fontsize', 16, 'string', num2str(permitt_diff_max_3), 'callback', @adj_permitt_diff_max);
+        [curr_relax_var, curr_slide] ...
+                            = deal(1, 3);
+        lim_gen
     end
 
     function lim_permitt_diff_4(source, eventdata)
-        dia                 = dialog;
-        curr_slide          = 4;
-        annotation('textbox', [0.4 0.75 0.1 0.1], 'string', [relax_labels{1} '(4) min'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp1                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.6 0.2 0.1], 'fontsize', 16, 'string', num2str(permitt_diff_min_4), 'callback', @adj_permitt_diff_min);
-        annotation('textbox', [0.4 0.35 0.1 0.1], 'string', [relax_labels{1} '(4) max'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp2                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.2 0.2 0.1], 'fontsize', 16, 'string', num2str(permitt_diff_max_4), 'callback', @adj_permitt_diff_max);
+        [curr_relax_var, curr_slide] ...
+                            = deal(1, 4);
+        lim_gen
     end
 
     function lim_freq_relax_1(source, eventdata)
-        dia                 = dialog;
-        curr_slide          = 1;
-        annotation('textbox', [0.4 0.75 0.1 0.1], 'string', [relax_labels{2} '(1) min'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp1                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.6 0.2 0.1], 'fontsize', 16, 'string', num2str(freq_relax_min_1), 'callback', @adj_freq_relax_min);
-        annotation('textbox', [0.4 0.35 0.1 0.1], 'string', [relax_labels{2} '(1) max'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp2                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.2 0.2 0.1], 'fontsize', 16, 'string', num2str(freq_relax_max_1), 'callback', @adj_freq_relax_max);
+        [curr_relax_var, curr_slide] ...
+                            = deal(2, 1);
+        lim_gen
     end
 
     function lim_freq_relax_2(source, eventdata)
-        dia                 = dialog;
-        curr_slide          = 2;
-        annotation('textbox', [0.4 0.75 0.1 0.1], 'string', [relax_labels{2} '(2) min'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp1                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.6 0.2 0.1], 'fontsize', 16, 'string', num2str(freq_relax_min_2), 'callback', @adj_freq_relax_min);
-        annotation('textbox', [0.4 0.35 0.1 0.1], 'string', [relax_labels{2} '(2) max'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp2                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.2 0.2 0.1], 'fontsize', 16, 'string', num2str(freq_relax_max_2), 'callback', @adj_freq_relax_max);
+        [curr_relax_var, curr_slide] ...
+                            = deal(2, 2);
+        lim_gen
     end
 
     function lim_freq_relax_3(source, eventdata)
-        dia                 = dialog;
-        curr_slide          = 3;
-        annotation('textbox', [0.4 0.75 0.1 0.1], 'string', [relax_labels{2} '(3) min'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp1                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.6 0.2 0.1], 'fontsize', 16, 'string', num2str(freq_relax_min_3), 'callback', @adj_freq_relax_min);
-        annotation('textbox', [0.4 0.35 0.1 0.1], 'string', [relax_labels{2} '(3) max'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp2                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.2 0.2 0.1], 'fontsize', 16, 'string', num2str(freq_relax_max_3), 'callback', @adj_freq_relax_max);
+        [curr_relax_var, curr_slide] ...
+                            = deal(2, 3);
+        lim_gen
     end
 
     function lim_freq_relax_4(source, eventdata)
-        dia                 = dialog;
-        curr_slide          = 4;
-        annotation('textbox', [0.4 0.75 0.1 0.1], 'string', [relax_labels{2} '(4) min'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp1                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.6 0.2 0.1], 'fontsize', 16, 'string', num2str(freq_relax_min_4), 'callback', @adj_freq_relax_min);
-        annotation('textbox', [0.4 0.35 0.1 0.1], 'string', [relax_labels{2} '(4) max'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp2                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.2 0.2 0.1], 'fontsize', 16, 'string', num2str(freq_relax_max_4), 'callback', @adj_freq_relax_max);
+        [curr_relax_var, curr_slide] ...
+                            = deal(2, 4);
+        lim_gen
     end
 
     function lim_alpha_cole_1(source, eventdata)
-        dia                 = dialog;
-        curr_slide          = 1;
-        annotation('textbox', [0.4 0.75 0.1 0.1], 'string', [relax_labels{3} '(1) min'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp1                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.6 0.2 0.1], 'fontsize', 16, 'string', num2str(alpha_cole_min_1), 'callback', @adj_alpha_cole_min);
-        annotation('textbox', [0.4 0.35 0.1 0.1], 'string', [relax_labels{3} '(1) max'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp2                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.2 0.2 0.1], 'fontsize', 16, 'string', num2str(alpha_cole_max_1), 'callback', @adj_alpha_cole_max);
+        [curr_relax_var, curr_slide] ...
+                            = deal(3, 1);
+        lim_gen
     end
 
     function lim_alpha_cole_2(source, eventdata)
-        dia                 = dialog;
-        curr_slide          = 2;
-        annotation('textbox', [0.4 0.75 0.1 0.1], 'string', [relax_labels{3} '(2) min'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp1                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.6 0.2 0.1], 'fontsize', 16, 'string', num2str(alpha_cole_min_2), 'callback', @adj_alpha_cole_min);
-        annotation('textbox', [0.4 0.35 0.1 0.1], 'string', [relax_labels{3} '(2) max'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp2                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.2 0.2 0.1], 'fontsize', 16, 'string', num2str(alpha_cole_max_2), 'callback', @adj_alpha_cole_max);
+        [curr_relax_var, curr_slide] ...
+                            = deal(3, 2);
+        lim_gen
     end
 
     function lim_alpha_cole_3(source, eventdata)
-        dia                 = dialog;
-        curr_slide          = 3;
-        annotation('textbox', [0.4 0.75 0.1 0.1], 'string', [relax_labels{3} '(3) min'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp1                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.6 0.2 0.1], 'fontsize', 16, 'string', num2str(alpha_cole_min_3), 'callback', @adj_alpha_cole_min);
-        annotation('textbox', [0.4 0.35 0.1 0.1], 'string', [relax_labels{3} '(3) max'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp2                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.2 0.2 0.1], 'fontsize', 16, 'string', num2str(alpha_cole_max_3), 'callback', @adj_alpha_cole_max);
+        [curr_relax_var, curr_slide] ...
+                            = deal(3, 3);
+        lim_gen
     end
 
     function lim_alpha_cole_4(source, eventdata)
-        dia                 = dialog;
-        curr_slide          = 4;
-        annotation('textbox', [0.4 0.75 0.1 0.1], 'string', [relax_labels{3} '(4) min'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp1                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.6 0.2 0.1], 'fontsize', 16, 'string', num2str(alpha_cole_min_4), 'callback', @adj_alpha_cole_min);
-        annotation('textbox', [0.4 0.35 0.1 0.1], 'string', [relax_labels{3} '(4) max'], 'fontsize', 16, 'edgecolor', 'none')
-        tmp2                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.2 0.2 0.1], 'fontsize', 16, 'string', num2str(alpha_cole_max_4), 'callback', @adj_alpha_cole_max);
+        [curr_relax_var, curr_slide] ...
+                            = deal(3, 4);
+        lim_gen
     end
 
+    function lim_gen(source, eventdata)
+        dia                 = dialog;
+        annotation('textbox', [0.4 0.75 0.1 0.1], 'string', [relax_labels{curr_relax_var} '(' num2str(curr_slide) ') min'], 'fontsize', 16, 'edgecolor', 'none')
+        tmp1                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.6 0.2 0.1], 'fontsize', 16, 'string', num2str(eval([relax_simple{curr_relax_var} '_min_' num2str(curr_slide)])), 'callback', eval(['@adj_' relax_simple{curr_relax_var} '_min']));
+        annotation('textbox', [0.4 0.35 0.1 0.1], 'string', [relax_labels{curr_relax_var} '(' num2str(curr_slide) ') max'], 'fontsize', 16, 'edgecolor', 'none')
+        tmp2                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.2 0.2 0.1], 'fontsize', 16, 'string', num2str(eval([relax_simple{curr_relax_var} '_max_' num2str(curr_slide)])), 'callback', eval(['@adj_' relax_simple{curr_relax_var} '_max']));
+    end
+%%
     function lim_permitt_hf(source, eventdata)
         dia                 = dialog;
         annotation('textbox', [0.4 0.75 0.1 0.1], 'string', '\epsilon''_{HF} min', 'fontsize', 16, 'edgecolor', 'none')
@@ -1590,7 +1475,7 @@ figure(inv_gui)
         annotation('textbox', [0.4 0.35 0.1 0.1], 'string', '\epsilon''_{HF} max', 'fontsize', 16, 'edgecolor', 'none')
         tmp2                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.2 0.2 0.1], 'fontsize', 16, 'string', num2str(permitt_hf_max), 'callback', @adj_permitt_hf_max);
     end
-
+%%
     function lim_conduct_dc(source, eventdata)
         dia                 = dialog;
         annotation('textbox', [0.4 0.75 0.1 0.1], 'string', '\sigma_{DC} min', 'fontsize', 16, 'edgecolor', 'none')
@@ -1598,66 +1483,66 @@ figure(inv_gui)
         annotation('textbox', [0.4 0.35 0.1 0.1], 'string', '\sigma_{DC} max', 'fontsize', 16, 'edgecolor', 'none')
         tmp2                = uicontrol(dia, 'style', 'edit', 'units', 'normalized', 'position', [0.4 0.2 0.2 0.1], 'fontsize', 16, 'string', num2str(conduct_dc_max), 'callback', @adj_conduct_dc_max);
     end
-
+%%
     function adj_permitt_diff_min(source, eventdata)
         eval(['permitt_diff_min_' num2str(curr_slide) ' = ' get(tmp1, 'string') ';']);
         model_min_abs(2 + ((curr_slide - 1) * 3)) ...
                             = eval(['permitt_diff_min_' num2str(curr_slide)]);
         set(permitt_diff_slide(curr_slide), 'min', eval(['permitt_diff_min_' num2str(curr_slide)]))
     end
-
+%%
     function adj_freq_relax_min(source, eventdata)
         eval(['freq_relax_min_' num2str(curr_slide) ' = ' get(tmp1, 'string') ';']);
         model_min_abs(3 + ((curr_slide - 1) * 3)) ...
                             = eval(['freq_relax_min_' num2str(curr_slide)]);
         set(freq_relax_slide(curr_slide), 'min', log10(eval(['freq_relax_min_' num2str(curr_slide)])))
     end
-
+%%
     function adj_alpha_cole_min(source, eventdata)
         eval(['alpha_cole_min_' num2str(curr_slide) ' = ' get(tmp1, 'string') ';']);
         model_min_abs(4 + ((curr_slide - 1) * 3)) ...
                             = eval(['alpha_cole_min_' num2str(curr_slide)]);
         set(alpha_cole_slide(curr_slide), 'min', eval(['alpha_cole_min_' num2str(curr_slide)]))
     end
-
+%%
     function adj_permitt_hf_min(source, eventdata)
         [permitt_hf_min, model_min_abs(1)] ...
                             = deal(str2double(get(tmp1, 'string')));
         set(permitt_hf_slide, 'min', permitt_hf_min)
     end
-
+%%
     function adj_conduct_dc_min(source, eventdata)
         conduct_dc_min      = str2double(get(tmp1, 'string'));
         set(conduct_dc_slide, 'min', log10(conduct_dc_min))
     end
-
+%%
     function adj_permitt_diff_max(source, eventdata)
         eval(['permitt_diff_max_' num2str(curr_slide) ' = ' get(tmp2, 'string') ';']);
         model_max_abs(2 + ((curr_slide - 1) * 3)) ...
                             = eval(['permitt_diff_max_' num2str(curr_slide)]);
         set(permitt_diff_slide(curr_slide), 'max', eval(['permitt_diff_max_' num2str(curr_slide)]))
     end
-
+%%
     function adj_freq_relax_max(source, eventdata)
         eval(['freq_relax_max_' num2str(curr_slide) ' = ' get(tmp2, 'string') ';']);
         model_max_abs(3 + ((curr_slide - 1) * 3)) ...
                             = eval(['freq_relax_max_' num2str(curr_slide)]);
         set(freq_relax_slide(curr_slide), 'max', log10(eval(['freq_relax_max_' num2str(curr_slide)])))
     end
-
+%%
     function adj_alpha_cole_max(source, eventdata)
         eval(['alpha_cole_max_' num2str(curr_slide) ' = ' get(tmp2, 'string') ';']);
         model_max_abs(4 + ((curr_slide - 1) * 3)) ...
                             = eval(['alpha_cole_max_' num2str(curr_slide)]);
         set(alpha_cole_slide(curr_slide), 'max', eval(['alpha_cole_min_' num2str(curr_slide)]))
     end
-
+%%
     function adj_permitt_hf_max(source, eventdata)
         [permitt_hf_max, model_max_abs(1)] ...
                             = deal(str2double(get(tmp2, 'string')));
         set(permitt_hf_slide, 'max', permitt_hf_max)
     end
-
+%%
     function adj_conduct_dc_max(source, eventdata)
         conduct_dc_max      = str2double(get(tmp2, 'string'));
         set(conduct_dc_slide, 'max', log10(conduct_dc_max))

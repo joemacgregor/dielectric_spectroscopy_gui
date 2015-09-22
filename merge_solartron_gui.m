@@ -1,20 +1,21 @@
 function merge_solartron_gui
-% MERGE_SOLARTRON_GUI
+% MERGE_SOLARTRON_GUI Merge Solartron data recorded at different
+% temperatures, based on temperature matching with each sweep and
+% comparison between different sweeps at the same temperature.
 % 
-% Merge Solartron data and temperatures, based on temperature matching with each sweep and comparison 
-% between different sweeps at the same temperature.
-% 
+% See dielectric_spectroscopy_gui_man.pdf for operation.
+%
 % David Stillman, Joe MacGregor
-% Last updated: 02/04/15
+% Last updated: 09/22/15
 
-do_big                      = true; % if true, uses 5 columns instead of 2
+do_big                      = false; % if true, uses 5 columns instead of 2
 
 % initialize loads of variables
 [path_curr, file_save, leg_str, vars2trim_str, var_merge, curr_plot, name_file_cfg] ...
                             = deal('');
 [num_load, ind_val, ind_merge, num_temp, num_merge, tmp1, tmp2, tmp3, tmp4] ...
                             = deal(0);
-[name_file_tmp, paths2load, files2load, files2load_ref, vars_all, num_set] ...
+[name_file_tmp, path2load, file2load, file2load_ref, vars_all, num_set] ...
                             = deal({});
 [curr_runs, curr_inds, temp_all] ...
                             = deal([]);
@@ -33,7 +34,7 @@ else
     subplot_start           = [0.05 0.48 0.35 0.36]; % start position of 1st subplot
 end
 plots                       = {'permitt_real{jj}' 'conduct{jj}' 'permitt_imag{jj}' '(resist_phase{jj} .* (180 / pi))'};
-ylabels                     = {'\epsilon''' '\sigma (S/m)' '\epsilon''''' '\theta (\circ)'}; % ylabels for each supblot
+ylabels                     = {'\epsilon''' '\sigma (S m^{-1})' '\epsilon''''' '\theta (\circ)'}; % ylabels for each supblot
 plots_single                = {'vars_all{curr_runs(jj)}.permitt_real{curr_inds(jj)}' 'vars_all{curr_runs(jj)}.conduct{curr_inds(jj)}' 'vars_all{curr_runs(jj)}.permitt_imag{curr_inds(jj)}' '(vars_all{curr_runs(jj)}.resist_phase{curr_inds(jj)} .* (180 / pi))'};
 [ax, ax2]                   = deal(NaN(1, 4));
 freq_default                = [1e-3 1e7]; % freq range to display
@@ -107,34 +108,34 @@ uicontrol(merge_gui, 'style', 'pushbutton', 'string', 'Reset', 'units', 'normali
 if do_big
     list_box                = uicontrol(merge_gui, 'style', 'popupmenu', 'string', 'N/A', 'units', 'normalized', 'position', [0.01 0.84 0.47 0.04], 'fontsize', 16, 'foregroundcolor', 'k');    
     for ii = 1:20 % 1st column of temps/checkboxes
-        temp_box(ii)        = annotation('textbox', [0.50 (0.96 - ((ii - 1) * 0.05)) 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none');
+        temp_box(ii)        = annotation('textbox', [0.50 (0.96 - ((ii - 1) * 0.05)) 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none', 'linewidth', 1);
         ind_box(ii)         = uicontrol(merge_gui, 'style', 'popupmenu', 'string', ' ', 'units', 'normalized', 'position', [0.55 (0.96 - ((ii - 1) * 0.05)) 0.04 0.03], 'fontsize', 16, 'foregroundcolor', 'k');
     end
     for ii = 21:40 % 2nd column
-        temp_box(ii)        = annotation('textbox', [0.60 (0.96 - (((ii - 20) - 1) * 0.05)) 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none');
+        temp_box(ii)        = annotation('textbox', [0.60 (0.96 - (((ii - 20) - 1) * 0.05)) 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none', 'linewidth', 1);
         ind_box(ii)         = uicontrol(merge_gui, 'style', 'popupmenu', 'string', ' ', 'units', 'normalized', 'position', [0.65 (0.96 - (((ii - 20) - 1) * 0.05)) 0.04 0.03], 'fontsize', 16, 'foregroundcolor', 'k');
     end
     for ii = 41:60 % 3rd column
-        temp_box(ii)        = annotation('textbox', [0.70 (0.96 - (((ii - 40) - 1) * 0.05)) 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none');
+        temp_box(ii)        = annotation('textbox', [0.70 (0.96 - (((ii - 40) - 1) * 0.05)) 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none', 'linewidth', 1);
         ind_box(ii)         = uicontrol(merge_gui, 'style', 'popupmenu', 'string', ' ', 'units', 'normalized', 'position', [0.75 (0.96 - (((ii - 40) - 1) * 0.05)) 0.04 0.03], 'fontsize', 16, 'foregroundcolor', 'k');
     end
     for ii = 61:80 % 4th column
-        temp_box(ii)        = annotation('textbox', [0.80 (0.96 - (((ii - 60) - 1) * 0.05)) 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none');
+        temp_box(ii)        = annotation('textbox', [0.80 (0.96 - (((ii - 60) - 1) * 0.05)) 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none', 'linewidth', 1);
         ind_box(ii)         = uicontrol(merge_gui, 'style', 'popupmenu', 'string', ' ', 'units', 'normalized', 'position', [0.85 (0.96 - (((ii - 60) - 1) * 0.05)) 0.04 0.03], 'fontsize', 16, 'foregroundcolor', 'k');
     end
     for ii = 81:100 % 5th column
-        temp_box(ii)        = annotation('textbox', [0.90 (0.96 - (((ii - 80) - 1) * 0.05)) 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none');
+        temp_box(ii)        = annotation('textbox', [0.90 (0.96 - (((ii - 80) - 1) * 0.05)) 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none', 'linewidth', 1);
         ind_box(ii)         = uicontrol(merge_gui, 'style', 'popupmenu', 'string', ' ', 'units', 'normalized', 'position', [0.95 (0.96 - (((ii - 80) - 1) * 0.05)) 0.04 0.03], 'fontsize', 16, 'foregroundcolor', 'k');
     end
 else
     annotation('textbox', [0.48 0.95 0.18 0.05], 'string', 'File reference list', 'fontsize', 16, 'edgecolor', 'none')
     list_box                = uicontrol(merge_gui, 'style', 'popupmenu', 'string', 'N/A', 'units', 'normalized', 'position', [0.48 0.92 0.29 0.04], 'fontsize', 16, 'foregroundcolor', 'k');
     for ii = 1:(num_box / 2) % 1st column of temps/checkboxes
-        temp_box(ii)        = annotation('textbox', [0.81 (0.96 - ((ii - 1) * 0.05)) 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none');
+        temp_box(ii)        = annotation('textbox', [0.81 (0.96 - ((ii - 1) * 0.05)) 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none', 'linewidth', 1);
         ind_box(ii)         = uicontrol(merge_gui, 'style', 'popupmenu', 'string', ' ', 'units', 'normalized', 'position', [0.86 (0.96 - ((ii - 1) * 0.05)) 0.04 0.03], 'fontsize', 16, 'foregroundcolor', 'k');
     end
     for ii = ((num_box / 2) + 1):num_box % 2nd column
-        temp_box(ii)        = annotation('textbox', [0.91 (0.96 - (((ii - (num_box / 2)) - 1) * 0.05)) 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none');
+        temp_box(ii)        = annotation('textbox', [0.91 (0.96 - (((ii - (num_box / 2)) - 1) * 0.05)) 0.05 0.03], 'string', '', 'color', 'k', 'fontsize', 16, 'backgroundcolor', 'w', 'edgecolor', 'k', 'interpreter', 'none', 'linewidth', 1);
         ind_box(ii)         = uicontrol(merge_gui, 'style', 'popupmenu', 'string', ' ', 'units', 'normalized', 'position', [0.96 (0.96 - (((ii - (num_box / 2)) - 1) * 0.05)) 0.04 0.03], 'fontsize', 16, 'foregroundcolor', 'k');
     end
 end
@@ -158,61 +159,58 @@ end
             end
         end
         
-        if ~isempty(name_file_tmp) % only process if didn't cancel
+        if isempty(name_file_tmp) % only process if didn't cancel
+            return
+        end
+
+        if ischar(name_file_tmp) % only selected one file
+            name_file_tmp   = {name_file_tmp};
+        end
+        name_file_tmp       = fliplr(name_file_tmp); % flip order of files because negative is usually dropped in name
+        file2load           = [file2load name_file_tmp];
+        path2load           = [path2load repmat({path_curr}, 1, length(name_file_tmp))];
+        num_load            = length(file2load);
         
-            if ischar(name_file_tmp) % only selected one file
-                name_file_tmp ...
-                            = {name_file_tmp};
-            end
-            name_file_tmp   = fliplr(name_file_tmp); % flip order of files because negative is usually dropped in name
-            files2load      = [files2load name_file_tmp];
-            paths2load      = [paths2load repmat({path_curr}, 1, length(name_file_tmp))];
-            num_load        = length(files2load);
-            
-            % cycle through each new file (no check for repeated files so watch out)
-            for ii = 1:length(name_file_tmp)
-                files2load_ref  ...
-                            = [files2load_ref [num2str(curr_box) ': ' name_file_tmp{ii}(1:(end - 4))]]; %#ok<*AGROW>
-                tmp1        = load([path_curr name_file_tmp{ii}]);
-                vars_all    = [vars_all tmp1]; % load each file separately and immediately rename
-                if ~isempty(strfind(name_file_tmp{ii}, 'proc'))
-                    for jj = 1:num_trim
-                        eval(['vars_all{curr_box}.' vars2trim{jj} ' = vars_all{curr_box}.' vars2trim{jj} '(vars_all{curr_box}.temp_match_best);'])
-                    end
+        % cycle through each new file (no check for repeated files so watch out)
+        for ii = 1:length(name_file_tmp)
+            file2load_ref   = [file2load_ref [num2str(curr_box) ': ' name_file_tmp{ii}(1:(end - 4))]]; %#ok<*AGROW>
+            tmp1            = load([path_curr name_file_tmp{ii}]);
+            vars_all        = [vars_all tmp1]; % load each file separately and immediately rename
+            if ~isempty(strfind(name_file_tmp{ii}, 'proc'))
+                for jj = 1:num_trim
+                    eval(['vars_all{curr_box}.' vars2trim{jj} ' = vars_all{curr_box}.' vars2trim{jj} '(vars_all{curr_box}.temp_match_best);'])
                 end
-                temp_all    = [temp_all; vars_all{curr_box}.temp_match]; % add this file's match temperatures to set
-                curr_box    = curr_box + 1;
             end
-            temp_all        = unique(temp_all); % keep unique set points
-            num_temp        = length(temp_all);
-            
-            % assign values to boxes and only include values that make sense for any given match temperature
-            num_set         = cell(1, num_temp); % set of indices to files for each temperature
-            for ii = 1:num_temp
-                set(temp_box(ii), 'string', sprintf('%4.1f', temp_all(ii)))
-                num_set{ii} = 0;
-                for jj = 1:num_load % test each merge temperature to see if it exists in files
-                    if any(temp_all(ii) == vars_all{jj}.temp_match)
-                        num_set{ii} ...
+            temp_all        = [temp_all; vars_all{curr_box}.temp_match]; % add this file's match temperatures to set
+            curr_box        = curr_box + 1;
+        end
+        temp_all            = unique(temp_all); % keep unique set points
+        num_temp            = length(temp_all);
+        
+        % assign values to boxes and only include values that make sense for any given match temperature
+        num_set             = cell(1, num_temp); % set of indices to files for each temperature
+        for ii = 1:num_temp
+            set(temp_box(ii), 'string', sprintf('%4.1f', temp_all(ii)))
+            num_set{ii}     = 0;
+            for jj = 1:num_load % test each merge temperature to see if it exists in files
+                if any(temp_all(ii) == vars_all{jj}.temp_match)
+                    num_set{ii} ...
                             = [num_set{ii} jj]; % only add index if there was a match
-                    end
-                end
-                set(ind_box(ii), 'string', num2cell(num_set{ii}), 'value', 2) % load set and 
-                if (length(num_set{ii}) > 2)
-                    set(temp_box(ii), 'color', 'r') % make temperatures with more then one option red (as in red bad, choice must be made)
                 end
             end
-            
-            set(list_box, 'string', files2load_ref) % update file list popup menu
-            set(check_box, 'string', num2cell(temp_all)) % for single temperature plotting
-            
+            set(ind_box(ii), 'string', num2cell(num_set{ii}), 'value', 2) % load set and 
+            if (length(num_set{ii}) > 2)
+                set(temp_box(ii), 'color', 'r') % make temperatures with more then one option red (as in red bad, choice must be made)
+            end
         end
         
+        set(list_box, 'string', file2load_ref) % update file list popup menu
+        set(check_box, 'string', num2cell(temp_all)) % for single temperature plotting
+
     end
-    
+%%
     function do_merge(source, eventdata)
-        [C_abs, C_imag, C_loss_tan, C_phase, C_real, Z_comp, Z_corr, freq, loss_tan, permitt_imag, permitt_real, resist_abs, resist_phase, ...
-            resist_real, temp_match, temp_max, temp_mean, temp_min, temp_std, time, conduct] ...
+        [C_abs, C_imag, C_loss_tan, C_phase, C_real, Z_comp, Z_corr, freq, loss_tan, permitt_imag, permitt_real, resist_abs, resist_phase, resist_real, temp_match, temp_max, temp_mean, temp_min, temp_std, time, conduct] ...
                             = deal(0); % reset for merging
         % prepare merging
         ind_merge           = zeros(num_temp, 1);
@@ -234,9 +232,9 @@ end
         end
         plot_merge % plot results after each merge
     end
-
+%%
     function plot_single(source, eventdata) %#ok<*INUSD> % individual temperature QC
-        temp_check           = temp_all(get(check_box, 'value')); % temperature to compare/check
+        temp_check          = temp_all(get(check_box, 'value')); % temperature to compare/check
         if any(ishandle(pd{1})) % cleanup if necessary
             delete(pd{:})
             [curr_runs, curr_inds] ...
@@ -255,7 +253,7 @@ end
             end
         end
         for ii = 1:length(curr_runs)
-            leg_str{ii}     = sprintf('%s: %4.3f +/- %1.3f', files2load{curr_runs(ii)}(1:(end - 9)), vars_all{curr_runs(ii)}.temp_mean(curr_inds(ii)), vars_all{curr_runs(ii)}.temp_std(curr_inds(ii)));
+            leg_str{ii}     = sprintf('%s: %4.3f +/- %1.3f', file2load{curr_runs(ii)}(1:(end - 9)), vars_all{curr_runs(ii)}.temp_mean(curr_inds(ii)), vars_all{curr_runs(ii)}.temp_std(curr_inds(ii)));
         end
         if (length(curr_runs) > 1)
             colors          = colormap(jet(length(curr_runs)));
@@ -282,7 +280,7 @@ end
         end
         curr_plot           = 'single';
     end
-    
+%%
     function plot_merge(source, eventdata)
         if any(ishandle(pd{1})) % cleanup
             delete(pd{:})
@@ -319,7 +317,7 @@ end
         end
         curr_plot           = 'merge';
     end
-
+%%
     function plot_pop(source, eventdata)
         switch curr_plot
             case 'single'
@@ -374,7 +372,7 @@ end
                 linkaxes(ax2, 'x')
         end
     end
-
+%%
     function do_save(source, eventdata) % save trimmed set
         save_cfg % first save config, if config filename is normal, then no need to reenter name of file
         if ~strcmp(name_file_cfg((end - 13):end), '_merge_cfg.mat')
@@ -387,7 +385,7 @@ end
         end
         eval(['save ' path_curr file_save ' ' vars2trim_str ';'])
     end
-
+%%
     function do_reset(source, eventdata) % reset everything
         if ishandle(lg)
             delete(lg)
@@ -399,7 +397,7 @@ end
                             = deal('');
         [num_load, ind_merge, num_temp, num_merge, tmp1, tmp2, tmp3, tmp4] ...
                             = deal(0);
-        [name_file_tmp, paths2load, files2load, files2load_ref, vars_all, num_set] ...
+        [name_file_tmp, path2load, file2load, file2load_ref, vars_all, num_set] ...
                             = deal({});
         [curr_runs, curr_inds, temp_all] ...
                             = deal([]);
@@ -413,7 +411,7 @@ end
             set(temp_box(ii), 'string', ' ', 'color', 'k')
         end
     end
-    
+%%
     function load_cfg(source, eventdata) % load configuration
         
         do_reset % reset first
@@ -429,16 +427,16 @@ end
         if ~isempty(name_file_cfg)
             
             tmp3            = load([path_curr name_file_cfg]);
-            [files2load, paths2load, num_load, path_curr, temp_all, num_temp, ind_val, file_save, num_set] ...
+            [file2load, path2load, num_load, path_curr, temp_all, num_temp, ind_val, file_save, num_set] ...
                             = deal(tmp3.files2load, tmp3.paths2load, tmp3.num_load, tmp3.path_curr, tmp3.temp_all, tmp3.num_temp, tmp3.ind_val, tmp3.file_save, tmp3.num_set);
             
-            for ii = 1:length(files2load)
-                set(temp_box(ii), 'string', files2load{ii}(1:(end - 4)))
-                files2load_ref ...
-                            = [files2load_ref [num2str(curr_box) ': ' files2load{ii}(1:(end - 4))]]; %#ok<*AGROW>
-                tmp         = load([paths2load{ii} files2load{ii}]);
+            for ii = 1:length(file2load)
+                set(temp_box(ii), 'string', file2load{ii}(1:(end - 4)))
+                file2load_ref ...
+                            = [file2load_ref [num2str(curr_box) ': ' file2load{ii}(1:(end - 4))]]; %#ok<*AGROW>
+                tmp         = load([path2load{ii} file2load{ii}]);
                 vars_all    = [vars_all tmp]; % load each file separately and immediately rename
-                if ~isempty(strfind(files2load{ii}, 'proc'))
+                if ~isempty(strfind(file2load{ii}, 'proc'))
                     for jj = 1:num_trim
                         eval(['vars_all{curr_box}.' vars2trim{jj} ' = vars_all{curr_box}.' vars2trim{jj} '(vars_all{curr_box}.temp_match_best);'])
                     end
@@ -454,13 +452,13 @@ end
                 end
             end
             
-            set(list_box, 'string', files2load_ref) % update file list popup menu
+            set(list_box, 'string', file2load_ref) % update file list popup menu
             set(check_box, 'string', num2cell(temp_all))
             
         end
         
     end
-    
+%%
     function save_cfg(source, eventdata) % save configuration
         if ~isempty(path_curr)
             [name_file_cfg, path_curr] ...
@@ -473,7 +471,7 @@ end
         for ii = 1:num_temp
             ind_val(ii)     = get(ind_box(ii), 'value');
         end
-        save([path_curr name_file_cfg], 'files2load', 'paths2load', 'num_load', 'path_curr', 'temp_all', 'num_temp', 'ind_val', 'file_save', 'num_set')
+        save([path_curr name_file_cfg], 'file2load', 'path2load', 'num_load', 'path_curr', 'temp_all', 'num_temp', 'ind_val', 'file_save', 'num_set')
     end
-    
+%%
 end
